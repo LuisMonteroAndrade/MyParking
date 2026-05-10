@@ -60,12 +60,26 @@ Proyecto "Mi Estacionamiento"
   │ Perfil    │ Modo oscuro (DataStore), selector de idioma ES/EN, cerrar sesión           │
   └───────────┴────────────────────────────────────────────────────────────────────────────┘
 
-Añadir para la siguiente version:
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────┐
+  │                            NOTAS DE LOS DESARROLLADORES                                │
+  └────────────────────────────────────────────────────────────────────────────────────────┘
+  
+Añadir para las siguiente version futuras del proyecto:
   - añadir funcionalidad del boton ""Editar Perfil"".
   - Añadir la funcion de pago con billetera google.
+  - En la creacion de cuenta en el apartado de tipo usuario -> conductor: añadir los campos de añadir vehiculo, patente del vehiculo y una imagen.
+  - En la creacion de cuenta en el apartado de tipo usuario -> propietatio: añadir los campos de añadir direccion, recion, comuna y una imagen del estacionamiento.
+  - Añadir boton de aceptar terminos y condiciones en la pantalla de registro.
+  - Añadir pantalla de propietario -> añadir estacinamiento.
+
 
 
 Correcion de bugs o funcionalidades para la siguiente version:
   -Arreglar el boton de cambio de tema (El modo oscuro).
   -Arreglar el Mapa.
-  
+
+
+
+
