@@ -1,4 +1,4 @@
-Proyecto "Mi Estacionamiento" — Completado
+Proyecto "Mi Estacionamiento"
 
   MiEstacionamiento/
   ├── settings.gradle / build.gradle / gradle.properties
