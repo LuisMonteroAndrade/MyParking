@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="screen_padding">16dp</dimen>
+    <dimen name="card_radius">16dp</dimen>
+    <dimen name="card_elevation">3dp</dimen>
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_large">48dp</dimen>
+    <dimen name="avatar_size">72dp</dimen>
+    <dimen name="parking_card_image_height">160dp</dimen>
+    <dimen name="parking_horizontal_width">180dp</dimen>
+    <dimen name="parking_horizontal_image_height">120dp</dimen>
+    <dimen name="bottom_nav_height">64dp</dimen>
+    <dimen name="section_spacing">24dp</dimen>
+    <dimen name="item_spacing">12dp</dimen>
+</resources>

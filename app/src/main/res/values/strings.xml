@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mi Estacionamiento</string>
+
+    <!-- Auth -->
+    <string name="login_subtitle">Encuentra tu lugar ideal</string>
+    <string name="hint_email">Correo electrónico</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="hint_confirm_password">Confirmar contraseña</string>
+    <string name="hint_name">Nombre completo</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="btn_login">Iniciar sesión</string>
+    <string name="btn_register">Crear cuenta</string>
+    <string name="btn_google">Continuar con Google</string>
+    <string name="btn_facebook">Continuar con Facebook</string>
+    <string name="or_continue_with">O continúa con</string>
+    <string name="no_account">¿No tienes cuenta?</string>
+    <string name="register_link">Regístrate</string>
+    <string name="have_account">¿Ya tienes cuenta?</string>
+    <string name="login_link">Inicia sesión</string>
+    <string name="user_type_label">Tipo de usuario</string>
+    <string name="driver">Conductor</string>
+    <string name="owner">Propietario</string>
+    <string name="register_title">Crear cuenta</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_explore">Explorar</string>
+    <string name="nav_saved">Guardados</string>
+    <string name="nav_profile">Perfil</string>
+
+    <!-- Home -->
+    <string name="greeting">¡Hola!</string>
+    <string name="search_hint">Buscar estacionamiento…</string>
+    <string name="popular_title">Lugares populares</string>
+    <string name="recent_title">Vistos recientemente</string>
+
+    <!-- Explore -->
+    <string name="explore_title">Explorar</string>
+
+    <!-- Detail -->
+    <string name="btn_schedule">Agendar</string>
+    <string name="available_spots">lugares disponibles</string>
+    <string name="price_per_hour">por hora</string>
+    <string name="schedule_success">¡Reserva confirmada! Recibirás un email con los detalles.</string>
+
+    <!-- Saved -->
+    <string name="saved_title">Guardados</string>
+    <string name="saved_empty_title">Sin favoritos aún</string>
+    <string name="saved_empty_desc">Guarda estacionamientos para acceder rápido</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Mi perfil</string>
+    <string name="edit_profile">Editar perfil</string>
+    <string name="dark_mode">Modo oscuro</string>
+    <string name="language">Idioma</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="settings_title">Configuración</string>
+    <string name="language_es">ES</string>
+    <string name="language_en">EN</string>
+    <string name="account_section">Mi cuenta</string>
+</resources>

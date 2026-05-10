@@ -1,0 +1,21 @@
+package com.miestacionamiento.ui.explore
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.switchMap
+import com.miestacionamiento.MiEstacionamientoApp
+import com.miestacionamiento.data.local.entity.ParkingEntity
+
+class ExploreViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository = (application as MiEstacionamientoApp).repository
+
+    private val _query = MutableLiveData("")
+    val parkings: LiveData<List<ParkingEntity>> = _query.switchMap { q ->
+        if (q.isBlank()) repository.allParkings else repository.searchParkings(q)
+    }
+
+    fun setQuery(query: String) { _query.value = query }
+}
