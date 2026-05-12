@@ -68,7 +68,7 @@ Proyecto "Mi Estacionamiento"
   
 Añadir para las siguiente version futuras del proyecto:
   - añadir funcionalidad del boton ""Editar Perfil"".
-  - Añadir la funcion de pago con billetera google.
+  - Añadir la funcion de pago con billetera google. (API billetera Google)
   - En la creacion de cuenta en el apartado de tipo usuario -> conductor: añadir los campos de añadir vehiculo, patente del vehiculo y una imagen.
   - En la creacion de cuenta en el apartado de tipo usuario -> propietatio: añadir los campos de añadir direccion, recion, comuna y una imagen del estacionamiento.
   - Añadir boton de aceptar terminos y condiciones en la pantalla de registro.
@@ -77,8 +77,9 @@ Añadir para las siguiente version futuras del proyecto:
 
 
 Correcion de bugs o funcionalidades para la siguiente version:
-  -Arreglar el boton de cambio de tema (El modo oscuro).
-  -Arreglar el Mapa.
+  - Arreglar el boton de cambio de tema (El modo oscuro).
+  - Arreglar el Mapa.
+  - Correcion del mapa ya que no funciona
 
 
 
