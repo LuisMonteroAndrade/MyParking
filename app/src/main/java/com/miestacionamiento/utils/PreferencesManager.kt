@@ -45,6 +45,13 @@ class PreferencesManager(private val context: Context) {
         }
     }
 
+    suspend fun updateProfile(name: String, email: String) {
+        context.dataStore.edit {
+            it[USER_NAME] = name
+            it[USER_EMAIL] = email
+        }
+    }
+
     suspend fun clearSession() {
         context.dataStore.edit { it.clear() }
     }

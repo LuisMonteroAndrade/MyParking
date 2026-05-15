@@ -24,6 +24,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch { prefs.setLanguage(lang) }
     }
 
+    fun saveProfile(name: String, email: String) {
+        viewModelScope.launch { prefs.updateProfile(name, email) }
+    }
+
     fun logout(onDone: () -> Unit) {
         viewModelScope.launch {
             prefs.clearSession()

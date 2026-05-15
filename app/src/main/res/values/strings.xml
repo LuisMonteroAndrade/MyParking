@@ -59,4 +59,10 @@
     <string name="language_es">ES</string>
     <string name="language_en">EN</string>
     <string name="account_section">Mi cuenta</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="edit_profile_title">Editar perfil</string>
+    <string name="error_empty_name">El nombre no puede estar vacío</string>
+    <string name="error_invalid_email">Ingresa un correo válido</string>
+    <string name="profile_updated">Perfil actualizado correctamente</string>
 </resources>
