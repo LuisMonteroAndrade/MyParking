@@ -15,6 +15,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     val language = prefs.language.asLiveData()
     val userName = prefs.userName.asLiveData()
     val userEmail = prefs.userEmail.asLiveData()
+    val notificationsEnabled = prefs.notificationsEnabled.asLiveData()
+    val profileImageUri = prefs.profileImageUri.asLiveData()
 
     fun setDarkMode(enabled: Boolean) {
         viewModelScope.launch { prefs.setDarkMode(enabled) }
@@ -24,8 +26,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch { prefs.setLanguage(lang) }
     }
 
-    fun saveProfile(name: String, email: String) {
-        viewModelScope.launch { prefs.updateProfile(name, email) }
+    fun setNotificationsEnabled(enabled: Boolean) {
+        viewModelScope.launch { prefs.setNotificationsEnabled(enabled) }
+    }
+
+    fun saveProfile(name: String, email: String, photoUri: String) {
+        viewModelScope.launch { prefs.updateProfile(name, email, photoUri) }
     }
 
     fun logout(onDone: () -> Unit) {

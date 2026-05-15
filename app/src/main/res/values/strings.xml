@@ -65,4 +65,9 @@
     <string name="error_empty_name">El nombre no puede estar vacío</string>
     <string name="error_invalid_email">Ingresa un correo válido</string>
     <string name="profile_updated">Perfil actualizado correctamente</string>
+    <string name="personal_info">Información personal</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="notifications_enabled">Activadas</string>
+    <string name="notifications_disabled">Desactivadas</string>
+    <string name="change_photo">Cambiar foto</string>
 </resources>

@@ -20,6 +20,8 @@ class PreferencesManager(private val context: Context) {
     private val USER_NAME = stringPreferencesKey("user_name")
     private val USER_EMAIL = stringPreferencesKey("user_email")
     private val USER_TYPE = stringPreferencesKey("user_type")
+    private val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+    private val PROFILE_IMAGE_URI = stringPreferencesKey("profile_image_uri")
 
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE] ?: false }
     val language: Flow<String> = context.dataStore.data.map { it[LANGUAGE] ?: "es" }
@@ -27,6 +29,8 @@ class PreferencesManager(private val context: Context) {
     val userName: Flow<String> = context.dataStore.data.map { it[USER_NAME] ?: "Usuario" }
     val userEmail: Flow<String> = context.dataStore.data.map { it[USER_EMAIL] ?: "" }
     val userType: Flow<String> = context.dataStore.data.map { it[USER_TYPE] ?: "DRIVER" }
+    val notificationsEnabled: Flow<Boolean> = context.dataStore.data.map { it[NOTIFICATIONS_ENABLED] ?: true }
+    val profileImageUri: Flow<String> = context.dataStore.data.map { it[PROFILE_IMAGE_URI] ?: "" }
 
     suspend fun setDarkMode(enabled: Boolean) {
         context.dataStore.edit { it[DARK_MODE] = enabled }
@@ -45,10 +49,15 @@ class PreferencesManager(private val context: Context) {
         }
     }
 
-    suspend fun updateProfile(name: String, email: String) {
+    suspend fun setNotificationsEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[NOTIFICATIONS_ENABLED] = enabled }
+    }
+
+    suspend fun updateProfile(name: String, email: String, photoUri: String) {
         context.dataStore.edit {
             it[USER_NAME] = name
             it[USER_EMAIL] = email
+            it[PROFILE_IMAGE_URI] = photoUri
         }
     }
 
