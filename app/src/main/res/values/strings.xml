@@ -23,6 +23,19 @@
     <string name="owner">Propietario</string>
     <string name="register_title">Crear cuenta</string>
 
+    <!-- Campos conductor -->
+    <string name="hint_vehicle_model">Modelo de vehículo</string>
+    <string name="hint_license_plate">Patente</string>
+    <string name="label_vehicle_photo">Foto del vehículo</string>
+    <string name="btn_select_photo">Seleccionar imagen</string>
+
+    <!-- Campos propietario -->
+    <string name="hint_address">Dirección</string>
+    <string name="hint_commune">Comuna</string>
+    <string name="hint_region">Región</string>
+    <string name="label_owner_photo">Añadir foto</string>
+    <string name="btn_add_photo">Seleccionar foto</string>
+
     <!-- Bottom Nav -->
     <string name="nav_home">Inicio</string>
     <string name="nav_explore">Explorar</string>

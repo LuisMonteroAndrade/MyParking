@@ -1,7 +1,10 @@
 package com.miestacionamiento.ui.auth
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
@@ -15,6 +18,26 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
     private val viewModel: RegisterViewModel by viewModels()
     private var selectedUserType = "DRIVER"
+
+    private var driverPhotoUri: Uri? = null
+    private var ownerPhotoUri: Uri? = null
+    private var currentPhotoTarget = ""
+
+    private val imagePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            if (currentPhotoTarget == "driver") {
+                driverPhotoUri = it
+                binding.ivDriverPhoto.setImageURI(it)
+                binding.ivDriverPhoto.visibility = View.VISIBLE
+            } else {
+                ownerPhotoUri = it
+                binding.ivOwnerPhoto.setImageURI(it)
+                binding.ivOwnerPhoto.visibility = View.VISIBLE
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,13 +54,19 @@ class RegisterActivity : AppCompatActivity() {
             selectedUserType = "DRIVER"
             binding.btnDriver.isSelected = true
             binding.btnOwner.isSelected = false
+            binding.layoutDriverFields.visibility = View.VISIBLE
+            binding.layoutOwnerFields.visibility = View.GONE
         }
         binding.btnOwner.setOnClickListener {
             selectedUserType = "OWNER"
             binding.btnDriver.isSelected = false
             binding.btnOwner.isSelected = true
+            binding.layoutDriverFields.visibility = View.GONE
+            binding.layoutOwnerFields.visibility = View.VISIBLE
         }
         binding.btnDriver.isSelected = true
+        binding.layoutDriverFields.visibility = View.VISIBLE
+        binding.layoutOwnerFields.visibility = View.GONE
     }
 
     private fun setupObservers() {
@@ -70,6 +99,14 @@ class RegisterActivity : AppCompatActivity() {
                 binding.etConfirmPassword.text.toString().trim(),
                 selectedUserType
             )
+        }
+        binding.btnSelectDriverPhoto.setOnClickListener {
+            currentPhotoTarget = "driver"
+            imagePickerLauncher.launch("image/*")
+        }
+        binding.btnSelectOwnerPhoto.setOnClickListener {
+            currentPhotoTarget = "owner"
+            imagePickerLauncher.launch("image/*")
         }
         binding.tvLogin.setOnClickListener { finish() }
         binding.toolbar.setNavigationOnClickListener { finish() }
