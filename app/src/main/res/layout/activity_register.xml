@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -132,8 +133,8 @@
                     android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPassword"
-                    android:imeOptions="actionDone" />
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campos específicos: Conductor -->
@@ -142,23 +143,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="visible"
+                tools:ignore="ExtraText">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilVehicleModel"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:id="@+id/textInputLayoutModelo"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:hint="@string/hint_vehicle_model">
+                    android:hint="@string/hint_vehicle_model"/>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etVehicleModel"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayoutMarca"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="Marca del vehículo">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/autoCompleteMarca"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textCapWords"
-                        android:imeOptions="actionNext" />
+                        android:inputType="none" />
+
                 </com.google.android.material.textfield.TextInputLayout>
+
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilLicensePlate"
@@ -172,8 +183,8 @@
                         android:id="@+id/etLicensePlate"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textCapCharacters"
-                        android:imeOptions="actionDone" />
+                        android:imeOptions="actionDone"
+                        android:inputType="textCapCharacters" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
@@ -190,9 +201,9 @@
                     android:layout_height="160dp"
                     android:layout_marginTop="8dp"
                     android:background="?attr/colorSurfaceVariant"
+                    android:contentDescription="@string/label_vehicle_photo"
                     android:scaleType="centerCrop"
-                    android:visibility="gone"
-                    android:contentDescription="@string/label_vehicle_photo" />
+                    android:visibility="gone" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSelectDriverPhoto"

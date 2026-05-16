@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -45,8 +46,31 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupUserTypeToggle()
+        setupDropdownMarcas()
         setupObservers()
         setupClicks()
+    }
+
+    private fun setupDropdownMarcas() {
+        val marcasVehiculos = arrayOf(
+            "Abarth", "Alfa Romeo", "Aston Martin", "Audi", "Austin", "BMW", "BYD", "Baic", "Bentley",
+            "Bestune", "Brilliance", "Cadillac", "Changan", "Changhe", "Chery", "Chevrolet", "Chrysler",
+            "Citroën", "Cupra", "DFSK", "DS Automobiles", "Dacia", "Daewoo", "Daihatsu", "Dodge",
+            "Dongfeng", "Exeed", "FAW", "Ferrari", "Fiat", "Ford", "Foton", "GAC Motor", "GMC",
+            "Geely", "Great Wall", "Haval", "Honda", "Hummer", "Hyundai", "Infiniti", "Isuzu", "Iveco",
+            "JAC", "JMC", "Jaguar", "Jeep", "Jetour", "Kaiyi", "Karma", "Kia", "KyC", "Lamborghini",
+            "Lancia", "Land Rover", "Lexus", "Lifan", "Lincoln", "Lotus", "MG", "Mahindra", "Maserati",
+            "Maxus", "Mazda", "McLaren", "Mercedes-Benz", "Mini", "Mitsubishi", "Morgan", "Nissan",
+            "Omoda", "Opel", "Peugeot", "Polestar", "Porsche", "Proton", "RAM", "Renault", "Rolls-Royce",
+            "Rover", "Saab", "Samsung", "Seat", "Shineray", "Skoda", "Smart", "SsangYong", "Subaru",
+            "Suzuki", "Tata", "Tesla", "Toyota", "Triumph", "Volkswagen", "Volvo", "Zotye", "Aprilia",
+            "BMW Motorrad", "Bajaj", "Benelli", "CFMoto", "Can-Am", "Ducati", "Gas Gas", "Haojue",
+            "Harley-Davidson", "Husqvarna", "Indian", "KTM", "Kawasaki", "Keeway", "Kymco", "MV Agusta",
+            "Moto Guzzi", "Piaggio", "Royal Enfield", "SYM", "Vespa", "Yamaha", "Zontes"
+        )
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, marcasVehiculos)
+        binding.autoCompleteMarca.setAdapter(adapter)
     }
 
     private fun setupUserTypeToggle() {
@@ -92,12 +116,22 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun setupClicks() {
         binding.btnRegister.setOnClickListener {
+            val marcaSeleccionada = binding.autoCompleteMarca.text.toString().trim()
+
+            // Validación: Si es Conductor, la marca no puede quedar vacía
+            if (selectedUserType == "DRIVER" && marcaSeleccionada.isEmpty()) {
+                Snackbar.make(binding.root, "Por favor selecciona una marca de vehículo", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Llamada al ViewModel
             viewModel.register(
                 binding.etName.text.toString().trim(),
                 binding.etEmail.text.toString().trim(),
                 binding.etPassword.text.toString().trim(),
                 binding.etConfirmPassword.text.toString().trim(),
                 selectedUserType
+                // marcaSeleccionada <-- Agrégala aquí si tu RegisterViewModel ya maneja este parámetro
             )
         }
         binding.btnSelectDriverPhoto.setOnClickListener {
