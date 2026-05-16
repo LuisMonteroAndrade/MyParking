@@ -3,11 +3,13 @@ package com.miestacionamiento.ui.profile
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
@@ -31,9 +33,14 @@ class ProfileFragment : Fragment() {
     private var currentName: String = ""
     private var currentEmail: String = ""
     private var currentPhotoUri: String = ""
+    private var currentVehicleBrand: String = ""
+    private var currentLicensePlate: String = ""
+    private var currentVehiclePhotoUri: String = ""
 
     private var dialogPhotoView: ShapeableImageView? = null
+    private var dialogVehiclePhotoView: ImageView? = null
     private var selectedPhotoUri: Uri? = null
+    private var selectedVehiclePhotoUri: Uri? = null
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -46,6 +53,23 @@ class ProfileFragment : Fragment() {
             } catch (_: SecurityException) { }
             selectedPhotoUri = it
             dialogPhotoView?.let { iv ->
+                Glide.with(this).load(it).centerCrop().into(iv)
+            }
+        }
+    }
+
+    private val pickVehicleImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: SecurityException) { }
+            selectedVehiclePhotoUri = it
+            dialogVehiclePhotoView?.let { iv ->
+                iv.visibility = View.VISIBLE
                 Glide.with(this).load(it).centerCrop().into(iv)
             }
         }
@@ -79,6 +103,9 @@ class ProfileFragment : Fragment() {
                 binding.ivProfileAvatar.setImageResource(R.drawable.ic_person_large)
             }
         }
+        viewModel.vehicleBrand.observe(viewLifecycleOwner) { currentVehicleBrand = it }
+        viewModel.licensePlate.observe(viewLifecycleOwner) { currentLicensePlate = it }
+        viewModel.vehiclePhotoUri.observe(viewLifecycleOwner) { currentVehiclePhotoUri = it }
 
         viewModel.isDarkMode.observe(viewLifecycleOwner) { enabled ->
             binding.switchDarkMode.setOnClickListener(null)
@@ -126,12 +153,30 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showPersonalInfoDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_personal_info, null)
+        val ivAvatar = dialogView.findViewById<ShapeableImageView>(R.id.ivInfoAvatar)
+        val tvInfoName = dialogView.findViewById<TextView>(R.id.tvInfoName)
+        val tvInfoEmail = dialogView.findViewById<TextView>(R.id.tvInfoEmail)
+        val tvInfoBrand = dialogView.findViewById<TextView>(R.id.tvInfoBrand)
+        val tvInfoPlate = dialogView.findViewById<TextView>(R.id.tvInfoPlate)
+        val ivVehiclePhoto = dialogView.findViewById<ImageView>(R.id.ivInfoVehiclePhoto)
+
+        tvInfoName.text = currentName
+        tvInfoEmail.text = currentEmail.ifEmpty { "Sin correo registrado" }
+        tvInfoBrand.text = currentVehicleBrand.ifEmpty { "Sin información" }
+        tvInfoPlate.text = currentLicensePlate.ifEmpty { "Sin información" }
+
+        if (currentPhotoUri.isNotEmpty()) {
+            Glide.with(this).load(Uri.parse(currentPhotoUri)).centerCrop()
+                .placeholder(R.drawable.ic_person_large).into(ivAvatar)
+        }
+        if (currentVehiclePhotoUri.isNotEmpty()) {
+            ivVehiclePhoto.visibility = View.VISIBLE
+            Glide.with(this).load(Uri.parse(currentVehiclePhotoUri)).centerCrop().into(ivVehiclePhoto)
+        }
+
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.personal_info)
-            .setMessage(
-                "${getString(R.string.hint_name)}: $currentName\n" +
-                "${getString(R.string.hint_email)}: $currentEmail"
-            )
+            .setView(dialogView)
             .setPositiveButton(R.string.edit_profile) { _, _ -> showEditProfileDialog() }
             .setNegativeButton(R.string.cancel, null)
             .show()
@@ -140,26 +185,55 @@ class ProfileFragment : Fragment() {
     private fun showEditProfileDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
         val tilName = dialogView.findViewById<TextInputLayout>(R.id.tilName)
-        val tilEmail = dialogView.findViewById<TextInputLayout>(R.id.tilEmail)
+        val tilVehicleBrand = dialogView.findViewById<TextInputLayout>(R.id.tilVehicleBrand)
         val etName = dialogView.findViewById<TextInputEditText>(R.id.etName)
-        val etEmail = dialogView.findViewById<TextInputEditText>(R.id.etEmail)
+        val autoCompleteBrand = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteVehicleBrand)
+        val etLicensePlate = dialogView.findViewById<TextInputEditText>(R.id.etLicensePlate)
         val ivPhoto = dialogView.findViewById<ShapeableImageView>(R.id.ivProfilePhoto)
         val btnChangePhoto = dialogView.findViewById<ImageView>(R.id.btnChangePhoto)
+        val ivVehiclePhoto = dialogView.findViewById<ImageView>(R.id.ivVehiclePhoto)
+        val btnSelectVehiclePhoto = dialogView.findViewById<View>(R.id.btnSelectVehiclePhoto)
+
+        val marcasVehiculos = arrayOf(
+            "Abarth", "Alfa Romeo", "Aston Martin", "Audi", "Austin", "BMW", "BYD", "Baic", "Bentley",
+            "Bestune", "Brilliance", "Cadillac", "Changan", "Changhe", "Chery", "Chevrolet", "Chrysler",
+            "Citroën", "Cupra", "DFSK", "DS Automobiles", "Dacia", "Daewoo", "Daihatsu", "Dodge",
+            "Dongfeng", "Exeed", "FAW", "Ferrari", "Fiat", "Ford", "Foton", "GAC Motor", "GMC",
+            "Geely", "Great Wall", "Haval", "Honda", "Hummer", "Hyundai", "Infiniti", "Isuzu", "Iveco",
+            "JAC", "JMC", "Jaguar", "Jeep", "Jetour", "Kaiyi", "Karma", "Kia", "KyC", "Lamborghini",
+            "Lancia", "Land Rover", "Lexus", "Lifan", "Lincoln", "Lotus", "MG", "Mahindra", "Maserati",
+            "Maxus", "Mazda", "McLaren", "Mercedes-Benz", "Mini", "Mitsubishi", "Morgan", "Nissan",
+            "Omoda", "Opel", "Peugeot", "Polestar", "Porsche", "Proton", "RAM", "Renault", "Rolls-Royce",
+            "Rover", "Saab", "Samsung", "Seat", "Shineray", "Skoda", "Smart", "SsangYong", "Subaru",
+            "Suzuki", "Tata", "Tesla", "Toyota", "Triumph", "Volkswagen", "Volvo", "Zotye", "Aprilia",
+            "BMW Motorrad", "Bajaj", "Benelli", "CFMoto", "Can-Am", "Ducati", "Gas Gas", "Haojue",
+            "Harley-Davidson", "Husqvarna", "Indian", "KTM", "Kawasaki", "Keeway", "Kymco", "MV Agusta",
+            "Moto Guzzi", "Piaggio", "Royal Enfield", "SYM", "Vespa", "Yamaha", "Zontes"
+        )
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, marcasVehiculos)
+        autoCompleteBrand.setAdapter(adapter)
 
         etName.setText(currentName)
-        etEmail.setText(currentEmail)
+        if (currentVehicleBrand.isNotEmpty()) autoCompleteBrand.setText(currentVehicleBrand, false)
+        etLicensePlate.setText(currentLicensePlate)
+
         selectedPhotoUri = if (currentPhotoUri.isNotEmpty()) Uri.parse(currentPhotoUri) else null
+        selectedVehiclePhotoUri = if (currentVehiclePhotoUri.isNotEmpty()) Uri.parse(currentVehiclePhotoUri) else null
+
         dialogPhotoView = ivPhoto
+        dialogVehiclePhotoView = ivVehiclePhoto
 
         if (currentPhotoUri.isNotEmpty()) {
-            Glide.with(this)
-                .load(Uri.parse(currentPhotoUri))
-                .centerCrop()
-                .placeholder(R.drawable.ic_person_large)
-                .into(ivPhoto)
+            Glide.with(this).load(Uri.parse(currentPhotoUri)).centerCrop()
+                .placeholder(R.drawable.ic_person_large).into(ivPhoto)
+        }
+        if (currentVehiclePhotoUri.isNotEmpty()) {
+            ivVehiclePhoto.visibility = View.VISIBLE
+            Glide.with(this).load(Uri.parse(currentVehiclePhotoUri)).centerCrop().into(ivVehiclePhoto)
         }
 
         btnChangePhoto.setOnClickListener { pickImageLauncher.launch("image/*") }
+        btnSelectVehiclePhoto.setOnClickListener { pickVehicleImageLauncher.launch("image/*") }
 
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.edit_profile_title)
@@ -168,32 +242,31 @@ class ProfileFragment : Fragment() {
             .setNegativeButton(R.string.cancel, null)
             .create()
 
-        dialog.setOnDismissListener { dialogPhotoView = null }
+        dialog.setOnDismissListener {
+            dialogPhotoView = null
+            dialogVehiclePhotoView = null
+        }
 
         dialog.setOnShowListener {
             dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val name = etName.text?.toString()?.trim() ?: ""
-                val email = etEmail.text?.toString()?.trim() ?: ""
+                val brand = autoCompleteBrand.text?.toString()?.trim() ?: ""
+                val plate = etLicensePlate.text?.toString()?.trim() ?: ""
 
                 tilName.error = null
-                tilEmail.error = null
+                tilVehicleBrand.error = null
 
-                var valid = true
                 if (name.isEmpty()) {
                     tilName.error = getString(R.string.error_empty_name)
-                    valid = false
-                }
-                if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    tilEmail.error = getString(R.string.error_invalid_email)
-                    valid = false
+                    return@setOnClickListener
                 }
 
-                if (valid) {
-                    val photoUri = selectedPhotoUri?.toString() ?: currentPhotoUri
-                    viewModel.saveProfile(name, email, photoUri)
-                    dialog.dismiss()
-                    Snackbar.make(binding.root, R.string.profile_updated, Snackbar.LENGTH_SHORT).show()
-                }
+                val photoUri = selectedPhotoUri?.toString() ?: currentPhotoUri
+                val vehiclePhotoUri = selectedVehiclePhotoUri?.toString() ?: currentVehiclePhotoUri
+                viewModel.saveProfile(name, currentEmail, photoUri)
+                viewModel.saveVehicleInfo(brand, plate, vehiclePhotoUri)
+                dialog.dismiss()
+                Snackbar.make(binding.root, R.string.profile_updated, Snackbar.LENGTH_SHORT).show()
             }
         }
 
@@ -217,6 +290,7 @@ class ProfileFragment : Fragment() {
 
     override fun onDestroyView() {
         dialogPhotoView = null
+        dialogVehiclePhotoView = null
         super.onDestroyView()
         _binding = null
     }

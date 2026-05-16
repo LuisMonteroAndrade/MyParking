@@ -17,6 +17,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     val userEmail = prefs.userEmail.asLiveData()
     val notificationsEnabled = prefs.notificationsEnabled.asLiveData()
     val profileImageUri = prefs.profileImageUri.asLiveData()
+    val vehicleBrand = prefs.vehicleBrand.asLiveData()
+    val licensePlate = prefs.licensePlate.asLiveData()
+    val vehiclePhotoUri = prefs.vehiclePhotoUri.asLiveData()
 
     fun setDarkMode(enabled: Boolean) {
         viewModelScope.launch { prefs.setDarkMode(enabled) }
@@ -32,6 +35,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun saveProfile(name: String, email: String, photoUri: String) {
         viewModelScope.launch { prefs.updateProfile(name, email, photoUri) }
+    }
+
+    fun saveVehicleInfo(brand: String, plate: String, photoUri: String) {
+        viewModelScope.launch { prefs.updateVehicleInfo(brand, plate, photoUri) }
     }
 
     fun logout(onDone: () -> Unit) {

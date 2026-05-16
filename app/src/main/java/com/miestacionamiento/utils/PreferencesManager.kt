@@ -22,6 +22,9 @@ class PreferencesManager(private val context: Context) {
     private val USER_TYPE = stringPreferencesKey("user_type")
     private val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     private val PROFILE_IMAGE_URI = stringPreferencesKey("profile_image_uri")
+    private val VEHICLE_BRAND = stringPreferencesKey("vehicle_brand")
+    private val LICENSE_PLATE = stringPreferencesKey("license_plate")
+    private val VEHICLE_PHOTO_URI = stringPreferencesKey("vehicle_photo_uri")
 
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE] ?: false }
     val language: Flow<String> = context.dataStore.data.map { it[LANGUAGE] ?: "es" }
@@ -31,6 +34,9 @@ class PreferencesManager(private val context: Context) {
     val userType: Flow<String> = context.dataStore.data.map { it[USER_TYPE] ?: "DRIVER" }
     val notificationsEnabled: Flow<Boolean> = context.dataStore.data.map { it[NOTIFICATIONS_ENABLED] ?: true }
     val profileImageUri: Flow<String> = context.dataStore.data.map { it[PROFILE_IMAGE_URI] ?: "" }
+    val vehicleBrand: Flow<String> = context.dataStore.data.map { it[VEHICLE_BRAND] ?: "" }
+    val licensePlate: Flow<String> = context.dataStore.data.map { it[LICENSE_PLATE] ?: "" }
+    val vehiclePhotoUri: Flow<String> = context.dataStore.data.map { it[VEHICLE_PHOTO_URI] ?: "" }
 
     suspend fun setDarkMode(enabled: Boolean) {
         context.dataStore.edit { it[DARK_MODE] = enabled }
@@ -58,6 +64,14 @@ class PreferencesManager(private val context: Context) {
             it[USER_NAME] = name
             it[USER_EMAIL] = email
             it[PROFILE_IMAGE_URI] = photoUri
+        }
+    }
+
+    suspend fun updateVehicleInfo(brand: String, plate: String, photoUri: String) {
+        context.dataStore.edit {
+            it[VEHICLE_BRAND] = brand
+            it[LICENSE_PLATE] = plate
+            it[VEHICLE_PHOTO_URI] = photoUri
         }
     }
 

@@ -83,4 +83,7 @@
     <string name="notifications_enabled">Activadas</string>
     <string name="notifications_disabled">Desactivadas</string>
     <string name="change_photo">Cambiar foto</string>
+    <string name="hint_vehicle_brand">Marca del vehículo</string>
+    <string name="vehicle_section">Mi vehículo</string>
+    <string name="error_empty_brand">Por favor selecciona una marca</string>
 </resources>
