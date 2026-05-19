@@ -36,6 +36,10 @@ class ProfileFragment : Fragment() {
     private var currentVehicleBrand: String = ""
     private var currentLicensePlate: String = ""
     private var currentVehiclePhotoUri: String = ""
+    private var currentUserType: String = "DRIVER"
+    private var currentAddress: String = ""
+    private var currentCommune: String = ""
+    private var currentRegion: String = ""
 
     private var dialogPhotoView: ShapeableImageView? = null
     private var dialogVehiclePhotoView: ImageView? = null
@@ -106,6 +110,10 @@ class ProfileFragment : Fragment() {
         viewModel.vehicleBrand.observe(viewLifecycleOwner) { currentVehicleBrand = it }
         viewModel.licensePlate.observe(viewLifecycleOwner) { currentLicensePlate = it }
         viewModel.vehiclePhotoUri.observe(viewLifecycleOwner) { currentVehiclePhotoUri = it }
+        viewModel.userType.observe(viewLifecycleOwner) { currentUserType = it }
+        viewModel.userAddress.observe(viewLifecycleOwner) { currentAddress = it }
+        viewModel.userCommune.observe(viewLifecycleOwner) { currentCommune = it }
+        viewModel.userRegion.observe(viewLifecycleOwner) { currentRegion = it }
 
         viewModel.isDarkMode.observe(viewLifecycleOwner) { enabled ->
             binding.switchDarkMode.setOnClickListener(null)
@@ -157,20 +165,36 @@ class ProfileFragment : Fragment() {
         val ivAvatar = dialogView.findViewById<ShapeableImageView>(R.id.ivInfoAvatar)
         val tvInfoName = dialogView.findViewById<TextView>(R.id.tvInfoName)
         val tvInfoEmail = dialogView.findViewById<TextView>(R.id.tvInfoEmail)
+        val layoutVehicleSection = dialogView.findViewById<View>(R.id.layoutVehicleSection)
         val tvInfoBrand = dialogView.findViewById<TextView>(R.id.tvInfoBrand)
         val tvInfoPlate = dialogView.findViewById<TextView>(R.id.tvInfoPlate)
         val ivVehiclePhoto = dialogView.findViewById<ImageView>(R.id.ivInfoVehiclePhoto)
+        val layoutOwnerSection = dialogView.findViewById<View>(R.id.layoutOwnerSection)
+        val tvInfoAddress = dialogView.findViewById<TextView>(R.id.tvInfoAddress)
+        val tvInfoCommune = dialogView.findViewById<TextView>(R.id.tvInfoCommune)
+        val tvInfoRegion = dialogView.findViewById<TextView>(R.id.tvInfoRegion)
 
         tvInfoName.text = currentName
         tvInfoEmail.text = currentEmail.ifEmpty { "Sin correo registrado" }
-        tvInfoBrand.text = currentVehicleBrand.ifEmpty { "Sin información" }
-        tvInfoPlate.text = currentLicensePlate.ifEmpty { "Sin información" }
+
+        if (currentUserType == "OWNER") {
+            layoutVehicleSection.visibility = View.GONE
+            layoutOwnerSection.visibility = View.VISIBLE
+            tvInfoAddress.text = currentAddress.ifEmpty { "Sin información" }
+            tvInfoCommune.text = currentCommune.ifEmpty { "Sin información" }
+            tvInfoRegion.text = currentRegion.ifEmpty { "Sin información" }
+        } else {
+            layoutVehicleSection.visibility = View.VISIBLE
+            layoutOwnerSection.visibility = View.GONE
+            tvInfoBrand.text = currentVehicleBrand.ifEmpty { "Sin información" }
+            tvInfoPlate.text = currentLicensePlate.ifEmpty { "Sin información" }
+        }
 
         if (currentPhotoUri.isNotEmpty()) {
             Glide.with(this).load(Uri.parse(currentPhotoUri)).centerCrop()
                 .placeholder(R.drawable.ic_person_large).into(ivAvatar)
         }
-        if (currentVehiclePhotoUri.isNotEmpty()) {
+        if (currentVehiclePhotoUri.isNotEmpty() && currentUserType != "OWNER") {
             ivVehiclePhoto.visibility = View.VISIBLE
             Glide.with(this).load(Uri.parse(currentVehiclePhotoUri)).centerCrop().into(ivVehiclePhoto)
         }
@@ -185,14 +209,86 @@ class ProfileFragment : Fragment() {
     private fun showEditProfileDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
         val tilName = dialogView.findViewById<TextInputLayout>(R.id.tilName)
-        val tilVehicleBrand = dialogView.findViewById<TextInputLayout>(R.id.tilVehicleBrand)
         val etName = dialogView.findViewById<TextInputEditText>(R.id.etName)
-        val autoCompleteBrand = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteVehicleBrand)
-        val etLicensePlate = dialogView.findViewById<TextInputEditText>(R.id.etLicensePlate)
         val ivPhoto = dialogView.findViewById<ShapeableImageView>(R.id.ivProfilePhoto)
         val btnChangePhoto = dialogView.findViewById<ImageView>(R.id.btnChangePhoto)
+        val layoutDriverSection = dialogView.findViewById<View>(R.id.layoutDriverSection)
+        val layoutOwnerSection = dialogView.findViewById<View>(R.id.layoutOwnerSection)
+
+        etName.setText(currentName)
+        selectedPhotoUri = if (currentPhotoUri.isNotEmpty()) Uri.parse(currentPhotoUri) else null
+        dialogPhotoView = ivPhoto
+
+        if (currentPhotoUri.isNotEmpty()) {
+            Glide.with(this).load(Uri.parse(currentPhotoUri)).centerCrop()
+                .placeholder(R.drawable.ic_person_large).into(ivPhoto)
+        }
+
+        btnChangePhoto.setOnClickListener { pickImageLauncher.launch("image/*") }
+
+        if (currentUserType == "OWNER") {
+            layoutDriverSection.visibility = View.GONE
+            layoutOwnerSection.visibility = View.VISIBLE
+            setupOwnerEditSection(dialogView)
+        } else {
+            layoutDriverSection.visibility = View.VISIBLE
+            layoutOwnerSection.visibility = View.GONE
+            setupDriverEditSection(dialogView)
+        }
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.edit_profile_title)
+            .setView(dialogView)
+            .setPositiveButton(R.string.save, null)
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+
+        dialog.setOnDismissListener {
+            dialogPhotoView = null
+            dialogVehiclePhotoView = null
+        }
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val name = etName.text?.toString()?.trim() ?: ""
+                tilName.error = null
+                if (name.isEmpty()) {
+                    tilName.error = getString(R.string.error_empty_name)
+                    return@setOnClickListener
+                }
+                val photoUri = selectedPhotoUri?.toString() ?: currentPhotoUri
+                viewModel.saveProfile(name, currentEmail, photoUri)
+
+                if (currentUserType == "OWNER") {
+                    val etAddress = dialogView.findViewById<TextInputEditText>(R.id.etOwnerAddress)
+                    val autoRegion = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteEditRegion)
+                    val autoCommune = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteEditCommune)
+                    val address = etAddress.text?.toString()?.trim() ?: ""
+                    val region = autoRegion.text?.toString()?.trim() ?: ""
+                    val commune = autoCommune.text?.toString()?.trim() ?: ""
+                    viewModel.saveOwnerInfo(address, commune, region)
+                } else {
+                    val autoCompleteBrand = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteVehicleBrand)
+                    val etLicensePlate = dialogView.findViewById<TextInputEditText>(R.id.etLicensePlate)
+                    val brand = autoCompleteBrand.text?.toString()?.trim() ?: ""
+                    val plate = etLicensePlate.text?.toString()?.trim() ?: ""
+                    val vehiclePhotoUri = selectedVehiclePhotoUri?.toString() ?: currentVehiclePhotoUri
+                    viewModel.saveVehicleInfo(brand, plate, vehiclePhotoUri)
+                }
+
+                dialog.dismiss()
+                Snackbar.make(binding.root, R.string.profile_updated, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun setupDriverEditSection(dialogView: android.view.View) {
+        val autoCompleteBrand = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteVehicleBrand)
+        val etLicensePlate = dialogView.findViewById<TextInputEditText>(R.id.etLicensePlate)
         val ivVehiclePhoto = dialogView.findViewById<ImageView>(R.id.ivVehiclePhoto)
-        val btnSelectVehiclePhoto = dialogView.findViewById<View>(R.id.btnSelectVehiclePhoto)
+        val btnSelectVehiclePhoto = dialogView.findViewById<android.view.View>(R.id.btnSelectVehiclePhoto)
 
         val marcasVehiculos = arrayOf(
             "Abarth", "Alfa Romeo", "Aston Martin", "Audi", "Austin", "BMW", "BYD", "Baic", "Bentley",
@@ -213,64 +309,62 @@ class ProfileFragment : Fragment() {
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, marcasVehiculos)
         autoCompleteBrand.setAdapter(adapter)
 
-        etName.setText(currentName)
         if (currentVehicleBrand.isNotEmpty()) autoCompleteBrand.setText(currentVehicleBrand, false)
         etLicensePlate.setText(currentLicensePlate)
-
-        selectedPhotoUri = if (currentPhotoUri.isNotEmpty()) Uri.parse(currentPhotoUri) else null
         selectedVehiclePhotoUri = if (currentVehiclePhotoUri.isNotEmpty()) Uri.parse(currentVehiclePhotoUri) else null
-
-        dialogPhotoView = ivPhoto
         dialogVehiclePhotoView = ivVehiclePhoto
 
-        if (currentPhotoUri.isNotEmpty()) {
-            Glide.with(this).load(Uri.parse(currentPhotoUri)).centerCrop()
-                .placeholder(R.drawable.ic_person_large).into(ivPhoto)
-        }
         if (currentVehiclePhotoUri.isNotEmpty()) {
             ivVehiclePhoto.visibility = View.VISIBLE
             Glide.with(this).load(Uri.parse(currentVehiclePhotoUri)).centerCrop().into(ivVehiclePhoto)
         }
-
-        btnChangePhoto.setOnClickListener { pickImageLauncher.launch("image/*") }
         btnSelectVehiclePhoto.setOnClickListener { pickVehicleImageLauncher.launch("image/*") }
+    }
 
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.edit_profile_title)
-            .setView(dialogView)
-            .setPositiveButton(R.string.save, null)
-            .setNegativeButton(R.string.cancel, null)
-            .create()
+    private fun setupOwnerEditSection(dialogView: android.view.View) {
+        val etAddress = dialogView.findViewById<TextInputEditText>(R.id.etOwnerAddress)
+        val autoRegion = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteEditRegion)
+        val autoCommune = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteEditCommune)
 
-        dialog.setOnDismissListener {
-            dialogPhotoView = null
-            dialogVehiclePhotoView = null
+        val regionesComunas = linkedMapOf(
+            "Arica y Parinacota" to listOf("Arica", "Camarones", "Putre", "General Lagos"),
+            "Tarapacá" to listOf("Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"),
+            "Antofagasta" to listOf("Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"),
+            "Atacama" to listOf("Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"),
+            "Coquimbo" to listOf("La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"),
+            "Valparaíso" to listOf("Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"),
+            "Metropolitana de Santiago" to listOf("Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil", "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví", "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado", "Peñaflor"),
+            "O'Higgins" to listOf("Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"),
+            "Maule" to listOf("Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre", "Yerbas Buenas"),
+            "Ñuble" to listOf("Chillán", "Bulnes", "Chillán Viejo", "El Carmen", "Pemuco", "Pinto", "Quillón", "San Ignacio", "Yungay", "Quirihue", "Cobquecura", "Coelemu", "Ninhue", "Portezuelo", "Ránquil", "Treguaco", "San Carlos", "Coihueco", "Ñiquén", "San Fabián", "San Nicolás"),
+            "Biobío" to listOf("Concepción", "Coronel", "Chiguayante", "Florida", "Hualpén", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Arauco", "Cañete", "Contulmo", "Curanilahue", "Lebu", "Los Álamos", "Tirúa"),
+            "La Araucanía" to listOf("Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"),
+            "Los Ríos" to listOf("Valdivia", "Corral", "Futrono", "La Unión", "Lago Ranco", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "Río Bueno"),
+            "Los Lagos" to listOf("Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"),
+            "Aysén" to listOf("Coyhaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane", "O'Higgins", "Tortel", "Chile Chico", "Río Ibáñez"),
+            "Magallanes y la Antártica Chilena" to listOf("Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine")
+        )
+        val regiones = regionesComunas.keys.toList()
+        val adapterRegiones = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, regiones)
+        autoRegion.setAdapter(adapterRegiones)
+
+        if (currentRegion.isNotEmpty()) {
+            autoRegion.setText(currentRegion, false)
+            val comunas = regionesComunas[currentRegion] ?: emptyList()
+            val adapterComunas = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, comunas)
+            autoCommune.setAdapter(adapterComunas)
+            if (currentCommune.isNotEmpty()) autoCommune.setText(currentCommune, false)
         }
 
-        dialog.setOnShowListener {
-            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val name = etName.text?.toString()?.trim() ?: ""
-                val brand = autoCompleteBrand.text?.toString()?.trim() ?: ""
-                val plate = etLicensePlate.text?.toString()?.trim() ?: ""
-
-                tilName.error = null
-                tilVehicleBrand.error = null
-
-                if (name.isEmpty()) {
-                    tilName.error = getString(R.string.error_empty_name)
-                    return@setOnClickListener
-                }
-
-                val photoUri = selectedPhotoUri?.toString() ?: currentPhotoUri
-                val vehiclePhotoUri = selectedVehiclePhotoUri?.toString() ?: currentVehiclePhotoUri
-                viewModel.saveProfile(name, currentEmail, photoUri)
-                viewModel.saveVehicleInfo(brand, plate, vehiclePhotoUri)
-                dialog.dismiss()
-                Snackbar.make(binding.root, R.string.profile_updated, Snackbar.LENGTH_SHORT).show()
-            }
+        autoRegion.setOnItemClickListener { _, _, position, _ ->
+            val regionSel = regiones[position]
+            val comunas = regionesComunas[regionSel] ?: emptyList()
+            val adapterComunas = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, comunas)
+            autoCommune.setText("")
+            autoCommune.setAdapter(adapterComunas)
         }
 
-        dialog.show()
+        etAddress.setText(currentAddress)
     }
 
     private fun showLogoutDialog() {

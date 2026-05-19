@@ -4,21 +4,27 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.miestacionamiento.databinding.ActivityLoginBinding
 import com.miestacionamiento.ui.main.MainActivity
+import com.miestacionamiento.utils.PreferencesManager
 import com.miestacionamiento.utils.gone
 import com.miestacionamiento.utils.visible
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModels()
+    private lateinit var prefsManager: PreferencesManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        prefsManager = PreferencesManager(this)
 
         setupObservers()
         setupClicks()
@@ -32,6 +38,24 @@ class LoginActivity : AppCompatActivity() {
                     binding.btnLogin.isEnabled = false
                     binding.btnGoogle.isEnabled = false
                     binding.btnFacebook.isEnabled = false
+                }
+                is AuthState.SuccessWithData -> {
+                    binding.progressBar.gone()
+                    lifecycleScope.launch {
+                        prefsManager.saveUserSession(
+                            id = state.userId,
+                            name = state.name,
+                            email = state.email,
+                            type = state.userType,
+                            token = state.token,
+                            vehicleBrand = state.vehicleBrand,
+                            vehiclePlate = state.vehiclePlate,
+                            address = state.address,
+                            commune = state.commune,
+                            region = state.region
+                        )
+                        navigateToMain()
+                    }
                 }
                 is AuthState.Success -> {
                     binding.progressBar.gone()

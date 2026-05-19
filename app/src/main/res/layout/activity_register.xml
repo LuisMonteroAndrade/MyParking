@@ -240,35 +240,35 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilCommune"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="@string/hint_commune">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etCommune"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textCapWords"
-                        android:imeOptions="actionNext" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilRegion"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:hint="@string/hint_region">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etRegion"
+                    <AutoCompleteTextView
+                        android:id="@+id/autoCompleteRegion"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textCapWords"
-                        android:imeOptions="actionDone" />
+                        android:inputType="none"
+                        android:focusable="false" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilCommune"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/hint_commune">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/autoCompleteCommune"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:focusable="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView

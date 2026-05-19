@@ -5,13 +5,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
+import com.miestacionamiento.data.model.LoginRequest
+import com.miestacionamiento.data.remote.RetrofitClient
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
 
     private val _state = MutableLiveData<AuthState>()
     val state: LiveData<AuthState> = _state
+
+    private val api = RetrofitClient.instance
 
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
@@ -28,30 +31,59 @@ class LoginViewModel : ViewModel() {
         }
         viewModelScope.launch {
             _state.value = AuthState.Loading
-            delay(1200)
-            _state.value = AuthState.Success
+            try {
+                val response = api.login(LoginRequest(email.trim(), password))
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    RetrofitClient.authInterceptor.setToken(body.token)
+                    _state.value = AuthState.SuccessWithData(
+                        token = body.token,
+                        userId = body.user.id,
+                        name = body.user.name,
+                        email = body.user.email,
+                        userType = body.user.userType,
+                        vehicleBrand = body.user.vehicleBrand,
+                        vehiclePlate = body.user.vehiclePlate,
+                        address = body.user.address,
+                        commune = body.user.commune,
+                        region = body.user.region
+                    )
+                } else {
+                    val errorMsg = when (response.code()) {
+                        401 -> "Email o contraseña incorrectos"
+                        else -> "Error al iniciar sesión (${response.code()})"
+                    }
+                    _state.value = AuthState.Error(errorMsg)
+                }
+            } catch (e: Exception) {
+                _state.value = AuthState.Error("No se pudo conectar al servidor. Verifica que el backend esté corriendo.")
+            }
         }
     }
 
     fun loginWithGoogle() {
-        viewModelScope.launch {
-            _state.value = AuthState.Loading
-            delay(800)
-            _state.value = AuthState.Success
-        }
+        _state.value = AuthState.Error("Login con Google no disponible aún")
     }
 
     fun loginWithFacebook() {
-        viewModelScope.launch {
-            _state.value = AuthState.Loading
-            delay(800)
-            _state.value = AuthState.Success
-        }
+        _state.value = AuthState.Error("Login con Facebook no disponible aún")
     }
 }
 
 sealed class AuthState {
     object Loading : AuthState()
     object Success : AuthState()
+    data class SuccessWithData(
+        val token: String,
+        val userId: Int,
+        val name: String,
+        val email: String,
+        val userType: String,
+        val vehicleBrand: String? = null,
+        val vehiclePlate: String? = null,
+        val address: String? = null,
+        val commune: String? = null,
+        val region: String? = null
+    ) : AuthState()
     data class Error(val message: String) : AuthState()
 }
