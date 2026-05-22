@@ -1,15 +1,24 @@
 package com.miestacionamiento.data.remote
 
 import com.miestacionamiento.data.model.AuthResponse
+import com.miestacionamiento.data.model.BookingResponse
+import com.miestacionamiento.data.model.CreateBookingRequest
+import com.miestacionamiento.data.model.CreateParkingRequest
+import com.miestacionamiento.data.model.DeleteResponse
 import com.miestacionamiento.data.model.LoginRequest
+import com.miestacionamiento.data.model.OwnerDashboardData
+import com.miestacionamiento.data.model.OwnerParking
+import com.miestacionamiento.data.model.OwnerStats
 import com.miestacionamiento.data.model.Parking
 import com.miestacionamiento.data.model.RegisterRequest
 import com.miestacionamiento.data.model.SaveResponse
 import com.miestacionamiento.data.model.UserProfile
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -62,4 +71,35 @@ interface ApiService {
 
     @PUT("users/profile")
     suspend fun updateProfile(@Body profile: Map<String, String?>): Response<UserProfile>
+
+    // --- Propietario: gestion de estacionamientos ---
+
+    @GET("owner/parkings")
+    suspend fun getOwnerParkings(): Response<List<OwnerParking>>
+
+    @POST("owner/parkings")
+    suspend fun createParking(@Body request: CreateParkingRequest): Response<OwnerParking>
+
+    @PUT("owner/parkings/{id}")
+    suspend fun updateParking(
+        @Path("id") id: Int,
+        @Body request: CreateParkingRequest
+    ): Response<OwnerParking>
+
+    @DELETE("owner/parkings/{id}")
+    suspend fun deleteParking(@Path("id") id: Int): Response<DeleteResponse>
+
+    @PATCH("owner/parkings/{id}/status")
+    suspend fun toggleParkingStatus(@Path("id") id: Int): Response<OwnerParking>
+
+    @GET("owner/stats")
+    suspend fun getOwnerStats(): Response<OwnerStats>
+
+    @GET("owner/dashboard")
+    suspend fun getOwnerDashboard(): Response<OwnerDashboardData>
+
+    // --- Reservas (Conductor) ---
+
+    @POST("bookings")
+    suspend fun createBooking(@Body request: CreateBookingRequest): Response<BookingResponse>
 }

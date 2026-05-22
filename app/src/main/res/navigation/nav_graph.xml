@@ -5,6 +5,13 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
+    <!-- Dashboard del propietario (inicio admin) -->
+    <fragment
+        android:id="@+id/ownerDashboardFragment"
+        android:name="com.miestacionamiento.ui.owner.OwnerDashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_owner_dashboard" />
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.miestacionamiento.ui.home.HomeFragment"
@@ -63,5 +70,38 @@
             app:argType="integer"
             android:defaultValue="-1" />
     </fragment>
+
+    <!-- Pantallas de propietario -->
+
+    <fragment
+        android:id="@+id/myParkingsFragment"
+        android:name="com.miestacionamiento.ui.owner.MyParkingsFragment"
+        android:label="Mis Propiedades"
+        tools:layout="@layout/fragment_my_parkings">
+        <action
+            android:id="@+id/action_myParkings_to_parkingForm"
+            app:destination="@id/parkingFormFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/parkingFormFragment"
+        android:name="com.miestacionamiento.ui.owner.ParkingFormFragment"
+        android:label="Publicar Estacionamiento"
+        tools:layout="@layout/fragment_parking_form">
+        <argument
+            android:name="parkingId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ownerStatsFragment"
+        android:name="com.miestacionamiento.ui.owner.OwnerStatsFragment"
+        android:label="Estadísticas"
+        tools:layout="@layout/fragment_owner_stats" />
 
 </navigation>

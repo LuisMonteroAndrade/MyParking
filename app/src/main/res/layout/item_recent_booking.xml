@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="14dp"
+        android:gravity="center_vertical">
+
+        <!-- Icono de estado -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@drawable/bg_circle_translucent"
+            app:cardElevation="0dp">
+
+            <ImageView
+                android:id="@+id/ivStatus"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_stats"
+                app:tint="?attr/colorPrimary" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Info de la reserva -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvParkingName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textStyle="bold"
+                tools:text="Estacionamiento Central" />
+
+            <TextView
+                android:id="@+id/tvDriverName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginTop="2dp"
+                tools:text="Juan Pérez • 2 horas" />
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginTop="2dp"
+                tools:text="Hoy, 14:30" />
+        </LinearLayout>
+
+        <!-- Monto y estado -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                tools:text="$5,000" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                android:layout_marginTop="4dp"
+                tools:text="Completado" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

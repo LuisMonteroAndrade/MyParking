@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Handle del BottomSheet -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="?attr/colorOnSurfaceVariant"
+        android:backgroundTint="?attr/colorOutlineVariant"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reservar estacionamiento"
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+        android:textStyle="bold" />
+
+    <!-- Nombre del estacionamiento -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="16dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_business"
+            app:tint="?attr/colorPrimary" />
+
+        <TextView
+            android:id="@+id/tvSheetParkingName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"
+            tools:text="Estacionamiento Central" />
+
+        <TextView
+            android:id="@+id/tvSheetPricePerHour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorPrimary"
+            tools:text="$1,000/h" />
+    </LinearLayout>
+
+    <!-- Selector de horas -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Duración"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="8dp" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleGroupHours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn1h"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="1 h" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn2h"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2 h" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn3h"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="3 h" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn4h"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="4 h" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Resumen del costo -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardBackgroundColor="?attr/colorSurfaceVariant"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total a pagar"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSheetTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                tools:text="$2,000" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Botón Google Pay -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGooglePay"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:text="Pagar con Google Pay"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#000000"
+        app:cornerRadius="28dp"
+        app:icon="@drawable/ic_google_pay"
+        app:iconTint="@android:color/white"
+        app:iconGravity="start"
+        app:iconPadding="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <!-- Botón reservar sin pago digital -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnConfirmBooking"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="8dp"
+        android:text="Reservar"
+        app:cornerRadius="28dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancelSheet"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:text="Cancelar"
+        app:cornerRadius="24dp" />
+
+</LinearLayout>

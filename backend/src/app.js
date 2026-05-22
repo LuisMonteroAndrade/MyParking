@@ -5,6 +5,8 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const parkingRoutes = require('./routes/parkings');
 const userRoutes = require('./routes/users');
+const ownerRoutes = require('./routes/owner');
+const bookingRoutes = require('./routes/bookings');
 
 const app = express();
 
@@ -19,6 +21,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/parkings', parkingRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/owner', ownerRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

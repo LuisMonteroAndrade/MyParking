@@ -41,6 +41,74 @@
     <string name="nav_explore">Explorar</string>
     <string name="nav_saved">Guardados</string>
     <string name="nav_profile">Perfil</string>
+    <string name="nav_my_parkings">Propiedades</string>
+    <string name="nav_stats">Estadísticas</string>
+
+    <!-- Propietario: formulario de publicación -->
+    <string name="form_parking_title">Publicar Estacionamiento</string>
+    <string name="form_edit_parking_title">Editar Estacionamiento</string>
+    <string name="hint_parking_name">Nombre del estacionamiento</string>
+    <string name="hint_parking_description">Descripción</string>
+    <string name="hint_price_per_hour">Precio por hora (CLP)</string>
+    <string name="hint_available_spots">Espacios disponibles</string>
+    <string name="hint_total_spots">Espacios totales</string>
+    <string name="hint_image_url">URL de imagen (opcional)</string>
+    <string name="btn_publish">Publicar</string>
+    <string name="btn_update">Actualizar</string>
+    <string name="parking_created_success">¡Estacionamiento publicado correctamente!</string>
+    <string name="parking_updated_success">Estacionamiento actualizado</string>
+    <string name="parking_deleted_success">Estacionamiento eliminado</string>
+    <string name="parking_frozen_success">Publicación congelada</string>
+    <string name="parking_activated_success">Publicación activada</string>
+
+    <!-- Propietario: gestión de propiedades -->
+    <string name="my_parkings_title">Mis Propiedades</string>
+    <string name="empty_parkings_title">Sin propiedades aún</string>
+    <string name="empty_parkings_desc">Crea tu primera publicación de estacionamiento</string>
+    <string name="status_active">Activo</string>
+    <string name="status_frozen">Congelado</string>
+    <string name="delete_confirm_title">Eliminar publicación</string>
+    <string name="delete_confirm_message">¿Estás seguro de eliminar este estacionamiento? Esta acción no se puede deshacer.</string>
+    <string name="confirm_delete">Eliminar</string>
+    <string name="edit">Editar</string>
+    <string name="freeze">Congelar</string>
+    <string name="activate">Activar</string>
+
+    <!-- Propietario: estadísticas -->
+    <string name="stats_title">Estadísticas</string>
+    <string name="stats_total_revenue">Ingresos totales</string>
+    <string name="stats_total_bookings">Reservas</string>
+    <string name="stats_unique_drivers">Conductores únicos</string>
+    <string name="stats_monthly_revenue">Ingresos por mes</string>
+    <string name="stats_monthly_bookings">Reservas por mes</string>
+    <string name="stats_no_data">Sin reservas aún</string>
+    <string name="stats_no_data_desc">Los ingresos aparecerán cuando los conductores reserven tu estacionamiento</string>
+
+    <!-- Dashboard del propietario -->
+    <string name="nav_dashboard">Inicio</string>
+    <string name="dashboard_admin_label">Panel de Administración</string>
+    <string name="dashboard_active_parkings">Activos</string>
+    <string name="dashboard_month_revenue">Ingresos</string>
+    <string name="dashboard_month_bookings">Reservas</string>
+    <string name="dashboard_quick_actions">Acciones rápidas</string>
+    <string name="dashboard_recent_activity">Actividad reciente</string>
+    <string name="dashboard_no_activity">Sin actividad aún</string>
+    <string name="dashboard_no_activity_desc">Las reservas aparecerán aquí cuando los conductores reserven</string>
+
+    <!-- Google Pay / Reservas -->
+    <string name="booking_sheet_title">Reservar estacionamiento</string>
+    <string name="btn_pay_google">Pagar con Google Pay</string>
+    <string name="btn_confirm_booking">Reservar</string>
+    <string name="booking_confirmed">¡Reserva confirmada!</string>
+    <string name="booking_cancelled">Pago cancelado</string>
+    <string name="booking_error">No se pudo confirmar la reserva</string>
+    <string name="duration_label">Duración</string>
+    <string name="total_label">Total a pagar</string>
+
+    <!-- Errores generales -->
+    <string name="error_required_fields">Completa todos los campos requeridos</string>
+    <string name="error_invalid_price">Ingresa un precio válido mayor a 0</string>
+    <string name="error_connection">Error de conexión con el servidor</string>
 
     <!-- Home -->
     <string name="greeting">¡Hola!</string>
