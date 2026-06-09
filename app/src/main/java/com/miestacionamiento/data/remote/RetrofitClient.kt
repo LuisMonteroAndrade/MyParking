@@ -12,7 +12,11 @@ object RetrofitClient {
     //   BASE_URL = "http://10.0.2.2:3000/api/"
     // Para conectar via WiFi (misma red):
     //   BASE_URL = "http://192.168.X.X:3000/api/"  <- cambiar a tu IP local
-    private const val BASE_URL = "http://192.168.1.34:3000/api/"
+
+    // Para conectar del telefono del lalo
+    // private const val BASE_URL = "http://192.168.100.218:3000/api/"
+
+    private const val BASE_URL = "http://192.168.100.218:3000/api/"
 
     val authInterceptor = AuthInterceptor()
 
