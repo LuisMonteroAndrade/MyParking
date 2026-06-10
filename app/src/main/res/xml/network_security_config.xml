@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Permite HTTP (no HTTPS) para el backend local durante desarrollo -->
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <!-- localhost para conexion via adb reverse -->
-        <domain includeSubdomains="true">localhost</domain>
-        <!-- IP local de la PC (WiFi) - cambiar segun tu red -->
-        <domain includeSubdomains="true">10.0.2.2</domain>
-        <domain includeSubdomains="true">192.168.100.218</domain>
-    </domain-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
 </network-security-config>

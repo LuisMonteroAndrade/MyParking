@@ -2,16 +2,24 @@ package com.miestacionamiento.data.remote
 
 import com.miestacionamiento.data.model.AuthResponse
 import com.miestacionamiento.data.model.BookingResponse
+import com.miestacionamiento.data.model.Conversation
 import com.miestacionamiento.data.model.CreateBookingRequest
+import com.miestacionamiento.data.model.CreateMessageRequest
 import com.miestacionamiento.data.model.CreateParkingRequest
+import com.miestacionamiento.data.model.CreateReviewRequest
 import com.miestacionamiento.data.model.DeleteResponse
 import com.miestacionamiento.data.model.LoginRequest
+import com.miestacionamiento.data.model.Message
 import com.miestacionamiento.data.model.OwnerDashboardData
 import com.miestacionamiento.data.model.OwnerParking
 import com.miestacionamiento.data.model.OwnerStats
 import com.miestacionamiento.data.model.Parking
 import com.miestacionamiento.data.model.RegisterRequest
+import com.miestacionamiento.data.model.Review
+import com.miestacionamiento.data.model.ReviewResponseRequest
 import com.miestacionamiento.data.model.SaveResponse
+import com.miestacionamiento.data.model.StartConversationRequest
+import com.miestacionamiento.data.model.StartConversationResponse
 import com.miestacionamiento.data.model.UserProfile
 import retrofit2.Response
 import retrofit2.http.Body
@@ -102,4 +110,38 @@ interface ApiService {
 
     @POST("bookings")
     suspend fun createBooking(@Body request: CreateBookingRequest): Response<BookingResponse>
+
+    // --- Reseñas ---
+
+    @GET("reviews/parking/{parkingId}")
+    suspend fun getReviews(@Path("parkingId") parkingId: Int): Response<List<Review>>
+
+    @POST("reviews")
+    suspend fun createReview(@Body request: CreateReviewRequest): Response<Review>
+
+    @PUT("reviews/{reviewId}/response")
+    suspend fun respondToReview(
+        @Path("reviewId") reviewId: Int,
+        @Body request: ReviewResponseRequest
+    ): Response<Map<String, String>>
+
+    @GET("reviews/my-parkings")
+    suspend fun getOwnerReviews(): Response<List<Review>>
+
+    // --- Chat ---
+
+    @GET("chat/conversations")
+    suspend fun getConversations(): Response<List<Conversation>>
+
+    @POST("chat/conversations")
+    suspend fun startConversation(@Body request: StartConversationRequest): Response<StartConversationResponse>
+
+    @GET("chat/conversations/{conversationId}/messages")
+    suspend fun getMessages(@Path("conversationId") conversationId: Int): Response<List<Message>>
+
+    @POST("chat/conversations/{conversationId}/messages")
+    suspend fun sendMessage(
+        @Path("conversationId") conversationId: Int,
+        @Body request: CreateMessageRequest
+    ): Response<Message>
 }

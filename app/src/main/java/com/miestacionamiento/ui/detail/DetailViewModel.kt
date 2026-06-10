@@ -1,6 +1,7 @@
 package com.miestacionamiento.ui.detail
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,13 +10,19 @@ import com.miestacionamiento.MiEstacionamientoApp
 import com.miestacionamiento.data.local.entity.ParkingEntity
 import com.miestacionamiento.data.model.BookingResponse
 import com.miestacionamiento.data.model.CreateBookingRequest
+import com.miestacionamiento.data.model.CreateReviewRequest
+import com.miestacionamiento.data.model.Review
+import com.miestacionamiento.data.model.StartConversationRequest
 import com.miestacionamiento.data.remote.RetrofitClient
+import com.miestacionamiento.utils.PreferencesManager
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = (application as MiEstacionamientoApp).repository
     private val api = RetrofitClient.instance
+    private val prefs = PreferencesManager(application)
 
     private val _parking = MutableLiveData<ParkingEntity?>()
     val parking: LiveData<ParkingEntity?> = _parking
@@ -26,12 +33,81 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     private val _isBookingLoading = MutableLiveData(false)
     val isBookingLoading: LiveData<Boolean> = _isBookingLoading
 
+    private val _reviews = MutableLiveData<List<Review>>(emptyList())
+    val reviews: LiveData<List<Review>> = _reviews
+
+    private val _reviewResult = MutableLiveData<String?>()
+    val reviewResult: LiveData<String?> = _reviewResult
+
+    private val _userType = MutableLiveData("DRIVER")
+    val userType: LiveData<String> = _userType
+
+    private val _userId = MutableLiveData(0)
+    val userId: LiveData<Int> = _userId
+
+    private val _chatConversationId = MutableLiveData<Int?>()
+    val chatConversationId: LiveData<Int?> = _chatConversationId
+
+    init {
+        viewModelScope.launch {
+            _userType.value = prefs.userType.first()
+            _userId.value = prefs.userId.first()
+        }
+    }
+
     fun loadParking(id: Int) {
         viewModelScope.launch {
             _parking.value = repository.getParkingById(id)
             repository.markRecentlyViewed(id)
+            loadReviews(id)
         }
     }
+
+    fun loadReviews(parkingId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = api.getReviews(parkingId)
+                if (response.isSuccessful) {
+                    _reviews.value = response.body() ?: emptyList()
+                }
+            } catch (e: Exception) {
+                Log.e("DetailVM", "Error cargando reseñas", e)
+            }
+        }
+    }
+
+    fun submitReview(parkingId: Int, rating: Int, comment: String?) {
+        viewModelScope.launch {
+            try {
+                val response = api.createReview(CreateReviewRequest(parkingId, rating, comment))
+                if (response.isSuccessful) {
+                    _reviewResult.value = "¡Reseña publicada!"
+                    loadReviews(parkingId)
+                } else {
+                    _reviewResult.value = "No se pudo publicar la reseña"
+                }
+            } catch (e: Exception) {
+                Log.e("DetailVM", "Error publicando reseña", e)
+                _reviewResult.value = "Error de conexión"
+            }
+        }
+    }
+
+    fun startChat(parkingId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = api.startConversation(StartConversationRequest(parkingId))
+                if (response.isSuccessful) {
+                    _chatConversationId.value = response.body()?.id
+                }
+            } catch (e: Exception) {
+                Log.e("DetailVM", "Error iniciando chat", e)
+            }
+        }
+    }
+
+    fun clearReviewResult() { _reviewResult.value = null }
+    fun clearChatConversationId() { _chatConversationId.value = null }
 
     fun toggleSaved() {
         val current = _parking.value ?: return

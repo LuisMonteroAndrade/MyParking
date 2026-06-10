@@ -9,6 +9,10 @@
         android:icon="@drawable/ic_business"
         android:title="@string/nav_my_parkings" />
     <item
+        android:id="@+id/chatListFragment"
+        android:icon="@drawable/ic_chat"
+        android:title="@string/nav_messages" />
+    <item
         android:id="@+id/ownerStatsFragment"
         android:icon="@drawable/ic_stats"
         android:title="@string/nav_stats" />

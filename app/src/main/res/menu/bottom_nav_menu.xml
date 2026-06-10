@@ -13,6 +13,10 @@
         android:icon="@drawable/ic_saved"
         android:title="@string/nav_saved" />
     <item
+        android:id="@+id/chatListFragment"
+        android:icon="@drawable/ic_chat"
+        android:title="@string/nav_messages" />
+    <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"
         android:title="@string/nav_profile" />

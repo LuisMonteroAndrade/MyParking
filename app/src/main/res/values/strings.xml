@@ -105,6 +105,12 @@
     <string name="duration_label">Duración</string>
     <string name="total_label">Total a pagar</string>
 
+    <!-- Reseñas -->
+    <string name="nav_messages">Mensajes</string>
+    <string name="write_review">Escribir reseña</string>
+    <string name="owner_response_label">Respuesta del propietario</string>
+    <string name="no_reviews_yet">Sé el primero en dejar una reseña</string>
+
     <!-- Errores generales -->
     <string name="error_required_fields">Completa todos los campos requeridos</string>
     <string name="error_invalid_price">Ingresa un precio válido mayor a 0</string>

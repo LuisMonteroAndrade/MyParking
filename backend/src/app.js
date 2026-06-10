@@ -7,6 +7,8 @@ const parkingRoutes = require('./routes/parkings');
 const userRoutes = require('./routes/users');
 const ownerRoutes = require('./routes/owner');
 const bookingRoutes = require('./routes/bookings');
+const reviewRoutes = require('./routes/reviews');
+const chatRoutes = require('./routes/chat');
 
 const app = express();
 
@@ -23,6 +25,8 @@ app.use('/api/parkings', parkingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

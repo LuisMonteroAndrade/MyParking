@@ -1,5 +1,6 @@
 package com.miestacionamiento.ui.auth
 
+import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -56,6 +57,7 @@ class LoginViewModel : ViewModel() {
                     _state.value = AuthState.Error(errorMsg)
                 }
             } catch (e: Exception) {
+                Log.e("LoginViewModel", "Error de conexión: ${e.javaClass.simpleName}: ${e.message}", e)
                 _state.value = AuthState.Error("No se pudo conectar al servidor. Verifica que el backend esté corriendo.")
             }
         }

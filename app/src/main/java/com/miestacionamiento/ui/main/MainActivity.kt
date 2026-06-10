@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
             topLevelDestIds = setOf(
                 R.id.ownerDashboardFragment,
                 R.id.myParkingsFragment,
+                R.id.chatListFragment,
                 R.id.ownerStatsFragment,
                 R.id.profileFragment
             )
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.homeFragment,
                 R.id.exploreFragment,
                 R.id.savedFragment,
+                R.id.chatListFragment,
                 R.id.profileFragment
             )
         }
@@ -61,7 +63,8 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.detailFragment, R.id.parkingFormFragment -> binding.bottomNav.gone()
+                R.id.detailFragment, R.id.parkingFormFragment,
+                R.id.chatFragment, R.id.reviewsOwnerFragment -> binding.bottomNav.gone()
                 else -> binding.bottomNav.visible()
             }
         }

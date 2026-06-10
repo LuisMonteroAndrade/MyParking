@@ -1,6 +1,7 @@
 package com.miestacionamiento.ui.detail
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -26,12 +28,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.miestacionamiento.R
 import com.miestacionamiento.data.local.entity.ParkingEntity
+import com.miestacionamiento.databinding.DialogAddReviewBinding
 import com.miestacionamiento.databinding.FragmentDetailBinding
 import com.miestacionamiento.databinding.LayoutBookingSheetBinding
+import com.miestacionamiento.ui.reviews.ReviewAdapter
 import com.miestacionamiento.utils.GooglePayHelper
+import com.miestacionamiento.utils.gone
 import com.miestacionamiento.utils.loadUrl
 import com.miestacionamiento.utils.toCurrencyString
 import com.miestacionamiento.utils.toStarString
+import com.miestacionamiento.utils.visible
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -65,6 +71,7 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
         binding.mapView.getMapAsync(this)
 
         setupGooglePay()
+        setupReviews()
         viewModel.loadParking(args.parkingId)
 
         viewModel.parking.observe(viewLifecycleOwner) { parking ->
@@ -88,9 +95,71 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
             viewModel.clearBookingResult()
         }
 
+        viewModel.reviewResult.observe(viewLifecycleOwner) { msg ->
+            msg ?: return@observe
+            Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
+            viewModel.clearReviewResult()
+        }
+
+        viewModel.chatConversationId.observe(viewLifecycleOwner) { convId ->
+            convId ?: return@observe
+            val action = DetailFragmentDirections.actionDetailToChat(convId, currentParking?.name ?: "Chat")
+            findNavController().navigate(action)
+            viewModel.clearChatConversationId()
+        }
+
+        viewModel.userType.observe(viewLifecycleOwner) { type ->
+            if (type == "DRIVER") {
+                binding.btnWriteReview.visible()
+                binding.btnChat.visible()
+                binding.spacerButtons.visible()
+            } else {
+                binding.btnWriteReview.gone()
+                binding.btnChat.gone()
+                binding.spacerButtons.gone()
+            }
+        }
+
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
         binding.btnSave.setOnClickListener { viewModel.toggleSaved() }
         binding.btnSchedule.setOnClickListener { showBookingSheet() }
+        binding.btnWriteReview.setOnClickListener { showReviewDialog() }
+        binding.btnChat.setOnClickListener { viewModel.startChat(args.parkingId) }
+    }
+
+    private fun setupReviews() {
+        val adapter = ReviewAdapter(isOwner = false)
+        binding.rvReviews.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvReviews.adapter = adapter
+
+        viewModel.reviews.observe(viewLifecycleOwner) { reviews ->
+            adapter.submitList(reviews)
+            if (reviews.isEmpty()) {
+                binding.tvNoReviews.visible()
+            } else {
+                binding.tvNoReviews.gone()
+            }
+        }
+    }
+
+    private fun showReviewDialog() {
+        val dialogBinding = DialogAddReviewBinding.inflate(layoutInflater)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogBinding.root)
+            .create()
+
+        dialogBinding.btnCancelReview.setOnClickListener { dialog.dismiss() }
+        dialogBinding.btnSubmitReview.setOnClickListener {
+            val rating = dialogBinding.ratingBarInput.rating.toInt()
+            if (rating == 0) {
+                Snackbar.make(binding.root, "Selecciona una calificación", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val comment = dialogBinding.etReviewComment.text?.toString()?.trim()
+            viewModel.submitReview(args.parkingId, rating, comment?.ifEmpty { null })
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun setupGooglePay() {

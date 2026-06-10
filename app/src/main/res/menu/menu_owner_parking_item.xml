@@ -7,6 +7,9 @@
         android:id="@+id/action_toggle_status"
         android:title="@string/freeze" />
     <item
+        android:id="@+id/action_reviews"
+        android:title="Ver reseñas" />
+    <item
         android:id="@+id/action_delete"
         android:title="@string/confirm_delete" />
 </menu>

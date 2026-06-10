@@ -253,19 +253,106 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Sección de Reseñas -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Cabecera reseñas -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Reseñas"
+                            android:textAppearance="?attr/textAppearanceTitleSmall"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnWriteReview"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Escribir reseña"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvReviews"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:nestedScrollingEnabled="false" />
+
+                    <TextView
+                        android:id="@+id/tvNoReviews"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:text="Sé el primero en dejar una reseña"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Botón flotante Agendar -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnSchedule"
+    <!-- Botones inferiores: Chat + Agendar -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/btn_schedule"
-        android:textSize="16sp"
-        app:cornerRadius="28dp" />
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp"
+        android:paddingTop="8dp"
+        android:background="?android:attr/colorBackground">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChat"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Chat"
+            android:visibility="gone"
+            app:icon="@drawable/ic_chat"
+            app:cornerRadius="28dp" />
+
+        <View
+            android:id="@+id/spacerButtons"
+            android:layout_width="8dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSchedule"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="@string/btn_schedule"
+            android:textSize="16sp"
+            app:cornerRadius="28dp" />
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -16,7 +16,8 @@ import com.miestacionamiento.databinding.ItemOwnerParkingBinding
 class OwnerParkingAdapter(
     private val onEdit: (OwnerParking) -> Unit,
     private val onDelete: (OwnerParking) -> Unit,
-    private val onToggleStatus: (OwnerParking) -> Unit
+    private val onToggleStatus: (OwnerParking) -> Unit,
+    private val onViewReviews: (() -> Unit)? = null
 ) : ListAdapter<OwnerParking, OwnerParkingAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -76,6 +77,7 @@ class OwnerParkingAdapter(
                         R.id.action_edit -> { onEdit(parking); true }
                         R.id.action_delete -> { onDelete(parking); true }
                         R.id.action_toggle_status -> { onToggleStatus(parking); true }
+                        R.id.action_reviews -> { onViewReviews?.invoke(); true }
                         else -> false
                     }
                 }

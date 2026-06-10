@@ -50,7 +50,8 @@ class MyParkingsFragment : Fragment() {
         adapter = OwnerParkingAdapter(
             onEdit = { parking -> navigateToForm(parking) },
             onDelete = { parking -> showDeleteConfirmDialog(parking) },
-            onToggleStatus = { parking -> viewModel.toggleParkingStatus(parking.id) }
+            onToggleStatus = { parking -> viewModel.toggleParkingStatus(parking.id) },
+            onViewReviews = { findNavController().navigate(R.id.action_myParkings_to_reviews) }
         )
         binding.recyclerParkings.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerParkings.adapter = adapter
