@@ -22,7 +22,7 @@ object GooglePayHelper {
             put("allowedPaymentMethods", JSONArray().put(cardPaymentMethod()))
             put("transactionInfo", transactionInfo(priceCLP))
             put("merchantInfo", JSONObject().apply {
-                put("merchantName", "Mi Estacionamiento")
+                put("merchantName", "MyParking")
             })
         }
         return paymentDataRequestJson.toString()
