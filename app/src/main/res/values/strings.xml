@@ -111,6 +111,12 @@
     <string name="owner_response_label">Respuesta del propietario</string>
     <string name="no_reviews_yet">Sé el primero en dejar una reseña</string>
 
+    <!-- Propietario: ubicación en formulario -->
+    <string name="btn_locate_map">Buscar en mapa</string>
+    <string name="map_location_hint">Toca el mapa para ajustar el marcador manualmente</string>
+    <string name="map_section_title">Ubicación en el mapa</string>
+    <string name="error_location_not_found">No se encontró la dirección. Verifica los datos o ajusta el pin manualmente.</string>
+
     <!-- Errores generales -->
     <string name="error_required_fields">Completa todos los campos requeridos</string>
     <string name="error_invalid_price">Ingresa un precio válido mayor a 0</string>

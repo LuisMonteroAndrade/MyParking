@@ -32,6 +32,19 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- FAB Mi ubicación -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMyLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="196dp"
+        android:contentDescription="Mi ubicación"
+        app:srcCompat="@drawable/ic_location"
+        app:fabSize="normal"
+        app:tint="@android:color/white" />
+
     <!-- Bottom sheet con la lista de estacionamientos -->
     <LinearLayout
         android:id="@+id/bottomSheet"

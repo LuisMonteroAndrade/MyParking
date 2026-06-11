@@ -1,14 +1,20 @@
 package com.miestacionamiento.ui.explore
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -16,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import com.miestacionamiento.MiEstacionamientoApp
 import com.miestacionamiento.data.local.entity.ParkingEntity
 import com.miestacionamiento.databinding.FragmentExploreBinding
@@ -28,6 +35,26 @@ class ExploreFragment : Fragment(), OnMapReadyCallback {
     private val viewModel: ExploreViewModel by viewModels()
     private var googleMap: GoogleMap? = null
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
+
+    private val fusedLocationClient by lazy {
+        LocationServices.getFusedLocationProviderClient(requireActivity())
+    }
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                      permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            enableMyLocation()
+        } else {
+            Snackbar.make(
+                binding.root,
+                "Activa los permisos de ubicación para ver tu posición en el mapa",
+                Snackbar.LENGTH_LONG
+            ).show()
+        }
+    }
 
     private val adapter = ParkingAdapter(
         onItemClick = { parking ->
@@ -80,6 +107,14 @@ class ExploreFragment : Fragment(), OnMapReadyCallback {
                 return true
             }
         })
+
+        binding.fabMyLocation.setOnClickListener {
+            if (hasLocationPermission()) {
+                centerOnMyLocation()
+            } else {
+                requestLocationPermissions()
+            }
+        }
     }
 
     private fun searchBarBottom(): Int = try {
@@ -104,7 +139,43 @@ class ExploreFragment : Fragment(), OnMapReadyCallback {
             )
         }
 
+        if (hasLocationPermission()) {
+            enableMyLocation()
+        } else {
+            requestLocationPermissions()
+        }
+
         viewModel.parkings.value?.let { updateMapMarkers(it) }
+    }
+
+    private fun hasLocationPermission(): Boolean =
+        ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+        ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+    private fun requestLocationPermissions() {
+        locationPermissionLauncher.launch(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        )
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun enableMyLocation() {
+        val map = googleMap ?: return
+        map.isMyLocationEnabled = true
+        centerOnMyLocation()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun centerOnMyLocation() {
+        if (!hasLocationPermission()) return
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (_binding == null) return@addOnSuccessListener
+            if (location != null) {
+                googleMap?.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude, location.longitude), 14f)
+                )
+            }
+        }
     }
 
     private fun updateMapMarkers(parkings: List<ParkingEntity>) {

@@ -8,7 +8,8 @@ import com.miestacionamiento.data.model.OwnerStats
 import com.miestacionamiento.data.remote.RetrofitClient
 import kotlinx.coroutines.launch
 
-class OwnerStatsViewModel : ViewModel() {
+class
+OwnerStatsViewModel : ViewModel() {
 
     private val api = RetrofitClient.instance
 

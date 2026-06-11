@@ -14,7 +14,7 @@ object RetrofitClient {
     // private const val BASE_URL = "http://192.168.100.218:3000/api/"  // Lalo
     // private const val BASE_URL = "http://10.0.2.2:3000/api/"         // USB/emulador
 
-    private const val BASE_URL = "http://192.168.100.218:3000/api/"
+    private const val BASE_URL = "http://192.168.1.35:3000/api/"
 
     val authInterceptor = AuthInterceptor()
 

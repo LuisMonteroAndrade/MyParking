@@ -49,18 +49,30 @@ class ParkingFormViewModel : ViewModel() {
         name: String,
         description: String,
         address: String,
+        commune: String,
+        region: String,
         pricePerHour: Double,
         availableSpots: Int,
         totalSpots: Int,
-        imageUrl: String
+        imageUrl: String,
+        latitude: Double,
+        longitude: Double
     ) {
+        val fullAddress = buildString {
+            append(address)
+            if (commune.isNotEmpty()) append(", $commune")
+            if (region.isNotEmpty()) append(", $region")
+        }
+
         val request = CreateParkingRequest(
             name = name,
             description = description,
-            address = address,
+            address = fullAddress,
             pricePerHour = pricePerHour,
             availableSpots = availableSpots,
             totalSpots = totalSpots,
+            latitude = latitude,
+            longitude = longitude,
             imageUrl = imageUrl
         )
 
