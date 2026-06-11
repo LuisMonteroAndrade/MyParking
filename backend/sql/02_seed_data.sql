@@ -1,62 +1,63 @@
 -- =========================================================
--- MiEstacionamiento - Datos iniciales de estacionamientos
+-- MyParking - Datos iniciales de estacionamientos en Chile
 -- Ejecutar DESPUES de 01_create_tables.sql
+-- Coordenadas reales de Santiago de Chile
 -- =========================================================
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Parking Central Plaza',
-        'Estacionamiento en el corazon de la ciudad con seguridad 24/7 y multiples servicios para tu comodidad.',
-        'Av. Corrientes 1234, Buenos Aires',
+VALUES ('Estacionamiento San Borja',
+        'Estacionamiento subterráneo en el corazón de Santiago, acceso directo al metro y a la Alameda. Seguridad 24/7.',
+        'Av. Libertador B. O''Higgins 3322, Santiago Centro',
         'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=600',
-        -34.6037, -58.3816, 350, 45, 120, 4.5, 238);
+        -33.4475, -70.6527, 1200, 45, 120, 4.5, 238);
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Garaje San Martin',
-        'Amplio estacionamiento cubierto con servicio de valet parking y vigilancia permanente.',
-        'Calle San Martin 567, Buenos Aires',
+VALUES ('Cochera Providencia',
+        'Amplio estacionamiento cubierto con servicio de valet y vigilancia permanente en el corazón de Providencia.',
+        'Av. Providencia 1234, Providencia',
         'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600',
-        -34.6118, -58.3960, 280, 12, 80, 4.2, 156);
+        -33.4312, -70.6126, 1500, 12, 80, 4.2, 156);
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Parking Puerto Madero',
-        'Moderno estacionamiento frente al rio con facil acceso a Puerto Madero y restaurantes.',
-        'Dique 4, Puerto Madero, Buenos Aires',
+VALUES ('Parking Costanera Center',
+        'Moderno estacionamiento en el mall más grande de Chile, con fácil acceso y múltiples niveles cubiertos.',
+        'Av. Andrés Bello 2425, Providencia',
         'https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?w=600',
-        -34.6152, -58.3632, 450, 87, 200, 4.7, 412);
+        -33.4177, -70.6065, 1800, 87, 200, 4.7, 412);
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Cochera Palermo',
-        'Estacionamiento seguro en el barrio de Palermo con vigilancia y camaras de seguridad.',
-        'Av. Santa Fe 3600, Palermo, Buenos Aires',
+VALUES ('Cochera Bellavista',
+        'Estacionamiento seguro en el barrio Bellavista, ideal para visitar restaurantes, cerro San Cristóbal y vida nocturna.',
+        'Pío Nono 340, Bellavista, Santiago',
         'https://images.unsplash.com/photo-1545127398-14699f92334b?w=600',
-        -34.5913, -58.4130, 320, 5, 60, 4.0, 89);
+        -33.4278, -70.6389, 1000, 5, 60, 4.0, 89);
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Parking Recoleta Premium',
-        'Estacionamiento premium en el exclusivo barrio de Recoleta, cerca de museos y galerias.',
-        'Av. Alvear 1800, Recoleta, Buenos Aires',
+VALUES ('Parking Vitacura Premium',
+        'Estacionamiento premium en el exclusivo barrio de Vitacura, cerca de galerías de arte y restaurantes de lujo.',
+        'Av. Vitacura 2939, Vitacura',
         'https://images.unsplash.com/photo-1611293388250-580b08c4a145?w=600',
-        -34.5877, -58.3927, 500, 30, 100, 4.8, 325);
+        -33.3982, -70.5988, 2500, 30, 100, 4.8, 325);
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Garaje Belgrano',
-        'Cochera familiar con multiples servicios adicionales, ideal para estadias largas.',
-        'Cabildo 2200, Belgrano, Buenos Aires',
+VALUES ('Garaje Ñuñoa',
+        'Cochera familiar cerca de la Plaza Ñuñoa con múltiples servicios, ideal para estadías largas y eventos.',
+        'Irarrázaval 3520, Ñuñoa',
         'https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?w=600',
-        -34.5598, -58.4572, 250, 22, 70, 4.3, 178);
+        -33.4568, -70.6041, 1000, 22, 70, 4.3, 178);
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Estacionamiento Microcentro',
-        'Ubicado en el microcentro porteno, perfecto para visitas de negocios y tramites.',
-        'Florida 800, Microcentro, Buenos Aires',
+VALUES ('Estacionamiento El Golf',
+        'Estacionamiento ejecutivo en el barrio financiero de Las Condes, perfecto para reuniones de negocios.',
+        'Isidora Goyenechea 2920, Las Condes',
         'https://images.unsplash.com/photo-1470224114660-3f6686c562eb?w=600',
-        -34.6043, -58.3741, 400, 18, 90, 4.1, 203);
+        -33.4134, -70.5937, 2000, 18, 90, 4.1, 203);
 
 INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE, PRICE_PER_HOUR, AVAILABLE_SPOTS, TOTAL_SPOTS, RATING, REVIEW_COUNT)
-VALUES ('Cochera San Telmo',
-        'Estacionamiento en el historico barrio de San Telmo, cerca de la feria y museos.',
-        'Defensa 1100, San Telmo, Buenos Aires',
+VALUES ('Cochera Lastarria',
+        'Estacionamiento en el histórico barrio Lastarria, cerca de museos, galerías y la mejor vida cultural de Santiago.',
+        'Merced 360, Lastarria, Santiago',
         'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600',
-        -34.6218, -58.3700, 300, 33, 75, 4.4, 142);
+        -33.4378, -70.6395, 1200, 33, 75, 4.4, 142);
 
 COMMIT;

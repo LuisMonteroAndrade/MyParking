@@ -25,6 +25,12 @@ interface ParkingDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertParkings(parkings: List<ParkingEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertParkings(parkings: List<ParkingEntity>)
+
+    @Query("SELECT id FROM parkings WHERE isSaved = 1")
+    suspend fun getSavedParkingIds(): List<Int>
+
     @Query("UPDATE parkings SET isSaved = :isSaved WHERE id = :id")
     suspend fun updateSavedStatus(id: Int, isSaved: Boolean)
 

@@ -4,10 +4,15 @@ import androidx.lifecycle.LiveData
 import com.miestacionamiento.data.local.dao.ParkingDao
 import com.miestacionamiento.data.local.entity.ParkingEntity
 import com.miestacionamiento.data.model.Parking
+import com.miestacionamiento.data.remote.ApiService
+import com.miestacionamiento.data.remote.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ParkingRepository(private val dao: ParkingDao) {
+class ParkingRepository(
+    private val dao: ParkingDao,
+    private val api: ApiService = RetrofitClient.instance
+) {
 
     val allParkings: LiveData<List<ParkingEntity>> = dao.getAllParkings()
     val savedParkings: LiveData<List<ParkingEntity>> = dao.getSavedParkings()
@@ -15,8 +20,26 @@ class ParkingRepository(private val dao: ParkingDao) {
 
     fun searchParkings(query: String): LiveData<List<ParkingEntity>> = dao.searchParkings(query)
 
-    suspend fun initializeIfEmpty() = withContext(Dispatchers.IO) {
+    suspend fun refreshFromApi(userId: Int? = null) = withContext(Dispatchers.IO) {
+        try {
+            val response = api.getParkings(userId?.takeIf { it > 0 })
+            if (response.isSuccessful) {
+                val apiParkings = response.body() ?: return@withContext
+                // Preservar isSaved local para no perder favoritos del usuario
+                val savedIds = dao.getSavedParkingIds().toSet()
+                dao.upsertParkings(apiParkings.map { p ->
+                    p.toEntity().copy(isSaved = savedIds.contains(p.id) || p.isSaved)
+                })
+            }
+        } catch (e: Exception) {
+            // Sin red: se usan los datos en caché de Room
+        }
+    }
+
+    suspend fun initializeIfEmpty(userId: Int? = null) = withContext(Dispatchers.IO) {
+        refreshFromApi(userId)
         if (dao.count() == 0) {
+            // Fallback de emergencia si el API no responde y Room está vacío
             dao.insertParkings(mockParkings().map { it.toEntity() })
         }
     }
@@ -41,46 +64,21 @@ class ParkingRepository(private val dao: ParkingDao) {
 
     companion object {
         fun mockParkings() = listOf(
-            Parking(1, "Parking Central Plaza",
-                "Estacionamiento en el corazón de la ciudad con seguridad 24/7 y múltiples servicios para tu comodidad.",
-                "Av. Corrientes 1234, Buenos Aires",
+            Parking(1, "Estacionamiento San Borja",
+                "Estacionamiento subterráneo en el corazón de Santiago, acceso directo al metro y a la Alameda.",
+                "Av. Libertador B. O'Higgins 3322, Santiago Centro",
                 "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=600",
-                -34.6037, -58.3816, 350.0, 45, 120, 4.5f, 238),
-            Parking(2, "Garaje San Martín",
-                "Amplio estacionamiento cubierto con servicio de valet parking y vigilancia permanente.",
-                "Calle San Martín 567, Buenos Aires",
+                -33.4475, -70.6527, 1200.0, 45, 120, 4.5f, 238),
+            Parking(2, "Cochera Providencia",
+                "Amplio estacionamiento cubierto con servicio de valet y vigilancia permanente.",
+                "Av. Providencia 1234, Providencia",
                 "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
-                -34.6118, -58.3960, 280.0, 12, 80, 4.2f, 156),
-            Parking(3, "Parking Puerto Madero",
-                "Moderno estacionamiento frente al río con fácil acceso a Puerto Madero y restaurantes.",
-                "Dique 4, Puerto Madero, Buenos Aires",
+                -33.4312, -70.6126, 1500.0, 12, 80, 4.2f, 156),
+            Parking(3, "Parking Costanera Center",
+                "Moderno estacionamiento en el mall más grande de Chile.",
+                "Av. Andrés Bello 2425, Providencia",
                 "https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?w=600",
-                -34.6152, -58.3632, 450.0, 87, 200, 4.7f, 412),
-            Parking(4, "Cochera Palermo",
-                "Estacionamiento seguro en el barrio de Palermo con vigilancia y cámaras de seguridad.",
-                "Av. Santa Fe 3600, Palermo, Buenos Aires",
-                "https://images.unsplash.com/photo-1545127398-14699f92334b?w=600",
-                -34.5913, -58.4130, 320.0, 5, 60, 4.0f, 89),
-            Parking(5, "Parking Recoleta Premium",
-                "Estacionamiento premium en el exclusivo barrio de Recoleta, cerca de museos y galerías.",
-                "Av. Alvear 1800, Recoleta, Buenos Aires",
-                "https://images.unsplash.com/photo-1611293388250-580b08c4a145?w=600",
-                -34.5877, -58.3927, 500.0, 30, 100, 4.8f, 325),
-            Parking(6, "Garaje Belgrano",
-                "Cochera familiar con múltiples servicios adicionales, ideal para estadías largas.",
-                "Cabildo 2200, Belgrano, Buenos Aires",
-                "https://images.unsplash.com/photo-1592838064575-70ed626d3a0e?w=600",
-                -34.5598, -58.4572, 250.0, 22, 70, 4.3f, 178),
-            Parking(7, "Estacionamiento Microcentro",
-                "Ubicado en el microcentro porteño, perfecto para visitas de negocios y trámites.",
-                "Florida 800, Microcentro, Buenos Aires",
-                "https://images.unsplash.com/photo-1470224114660-3f6686c562eb?w=600",
-                -34.6043, -58.3741, 400.0, 18, 90, 4.1f, 203),
-            Parking(8, "Cochera San Telmo",
-                "Estacionamiento en el histórico barrio de San Telmo, cerca de la feria y museos.",
-                "Defensa 1100, San Telmo, Buenos Aires",
-                "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600",
-                -34.6218, -58.3700, 300.0, 33, 75, 4.4f, 142)
+                -33.4177, -70.6065, 1800.0, 87, 200, 4.7f, 412)
         )
     }
 }

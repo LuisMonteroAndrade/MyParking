@@ -15,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.miestacionamiento.MiEstacionamientoApp
 import com.miestacionamiento.data.local.entity.ParkingEntity
 import com.miestacionamiento.databinding.FragmentExploreBinding
@@ -26,6 +27,7 @@ class ExploreFragment : Fragment(), OnMapReadyCallback {
     private val binding get() = _binding!!
     private val viewModel: ExploreViewModel by viewModels()
     private var googleMap: GoogleMap? = null
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
     private val adapter = ParkingAdapter(
         onItemClick = { parking ->
@@ -54,9 +56,20 @@ class ExploreFragment : Fragment(), OnMapReadyCallback {
 
         binding.rvParkings.adapter = adapter
 
+        viewModel.refresh()
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {}
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                val covered = (binding.mapView.height - bottomSheet.top).coerceAtLeast(0)
+                googleMap?.setPadding(0, searchBarBottom(), 0, covered)
+            }
+        })
+
         viewModel.parkings.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
-            binding.tvCount.text = "${list.size} estacionamientos encontrados"
+            binding.tvCount.text = "${list.size} disponibles"
             updateMapMarkers(list)
         }
 
@@ -69,10 +82,20 @@ class ExploreFragment : Fragment(), OnMapReadyCallback {
         })
     }
 
+    private fun searchBarBottom(): Int = try {
+        binding.searchCard.bottom + (8 * resources.displayMetrics.density).toInt()
+    } catch (e: Exception) { 0 }
+
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isMyLocationButtonEnabled = false
+
+        binding.bottomSheet.post {
+            val peekPx = bottomSheetBehavior.peekHeight
+                .takeIf { it > 0 } ?: (180 * resources.displayMetrics.density).toInt()
+            map.setPadding(0, searchBarBottom(), 0, peekPx)
+        }
 
         map.setOnInfoWindowClickListener { marker ->
             val parkingId = marker.tag as? Int ?: return@setOnInfoWindowClickListener
@@ -96,18 +119,17 @@ class ExploreFragment : Fragment(), OnMapReadyCallback {
                 MarkerOptions()
                     .position(position)
                     .title(parking.name)
-                    .snippet(parking.address)
+                    .snippet("${parking.address} · $${parking.pricePerHour.toLong()}/h")
             )
             marker?.tag = parking.id
             boundsBuilder.include(position)
         }
 
         try {
-            val bounds = boundsBuilder.build()
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 120))
         } catch (e: Exception) {
             val first = parkings.first()
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(first.latitude, first.longitude), 14f))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(first.latitude, first.longitude), 12f))
         }
     }
 
