@@ -11,6 +11,8 @@ function sign(params) {
   return crypto.createHmac('sha256', FLOW_SECRET_KEY).update(toSign).digest('hex');
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 async function createPayment({ commerceOrder, subject, amount, email, urlConfirmation, urlReturn }) {
   if (!FLOW_API_KEY || FLOW_API_KEY === 'TU_API_KEY_AQUI') {
     throw new Error('FLOW_API_KEY no configurada en .env');
@@ -19,13 +21,23 @@ async function createPayment({ commerceOrder, subject, amount, email, urlConfirm
     throw new Error('FLOW_SECRET_KEY no configurada en .env');
   }
 
+  const normalizedEmail = (email || '').toLowerCase().trim();
+  if (!EMAIL_REGEX.test(normalizedEmail)) {
+    throw new Error(`Email inválido para pago Flow: ${email}`);
+  }
+
+  const isSandbox = FLOW_API_URL.includes('sandbox');
+  const finalEmail = isSandbox && process.env.FLOW_TEST_EMAIL
+    ? process.env.FLOW_TEST_EMAIL
+    : normalizedEmail;
+
   const params = {
     apiKey: FLOW_API_KEY,
     commerceOrder: String(commerceOrder),
     subject: String(subject).substring(0, 200),
     currency: 'CLP',
     amount: Math.round(amount),
-    email,
+    email: finalEmail,
     paymentMethod: '9',
     urlConfirmation,
     urlReturn

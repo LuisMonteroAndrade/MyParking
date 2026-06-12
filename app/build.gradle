@@ -20,7 +20,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            archivesBaseName = "MyParking"
+        }
         release {
+            archivesBaseName = "MyParking"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
