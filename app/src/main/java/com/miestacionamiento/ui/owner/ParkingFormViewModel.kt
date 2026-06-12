@@ -1,15 +1,22 @@
 package com.miestacionamiento.ui.owner
 
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.miestacionamiento.data.model.CreateParkingRequest
 import com.miestacionamiento.data.model.OwnerParking
 import com.miestacionamiento.data.remote.RetrofitClient
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
-class ParkingFormViewModel : ViewModel() {
+class ParkingFormViewModel(application: Application) : AndroidViewModel(application) {
 
     private val api = RetrofitClient.instance
 
@@ -47,42 +54,53 @@ class ParkingFormViewModel : ViewModel() {
     fun saveParking(
         parkingId: Int,
         name: String,
+        fullAddress: String,
         description: String,
-        address: String,
-        commune: String,
-        region: String,
         pricePerHour: Double,
         availableSpots: Int,
         totalSpots: Int,
-        imageUrl: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        imageUri: Uri?,
+        existingImageUrl: String
     ) {
-        val fullAddress = buildString {
-            append(address)
-            if (commune.isNotEmpty()) append(", $commune")
-            if (region.isNotEmpty()) append(", $region")
-        }
-
-        val request = CreateParkingRequest(
-            name = name,
-            description = description,
-            address = fullAddress,
-            pricePerHour = pricePerHour,
-            availableSpots = availableSpots,
-            totalSpots = totalSpots,
-            latitude = latitude,
-            longitude = longitude,
-            imageUrl = imageUrl
-        )
-
         viewModelScope.launch {
             _isSaving.value = true
             try {
+                fun String.toBody() = toRequestBody("text/plain".toMediaType())
+
+                val imagePart = imageUri?.let { buildImagePart(it) }
+
                 val response = if (parkingId == -1) {
-                    api.createParking(request)
+                    if (imagePart == null) {
+                        _error.value = "Selecciona una imagen para continuar"
+                        return@launch
+                    }
+                    api.createParking(
+                        name = name.toBody(),
+                        description = description.toBody(),
+                        address = fullAddress.toBody(),
+                        pricePerHour = pricePerHour.toString().toBody(),
+                        availableSpots = availableSpots.toString().toBody(),
+                        totalSpots = totalSpots.toString().toBody(),
+                        latitude = latitude.toString().toBody(),
+                        longitude = longitude.toString().toBody(),
+                        image = imagePart
+                    )
                 } else {
-                    api.updateParking(parkingId, request)
+                    api.updateParking(
+                        id = parkingId,
+                        name = name.toBody(),
+                        description = description.toBody(),
+                        address = fullAddress.toBody(),
+                        pricePerHour = pricePerHour.toString().toBody(),
+                        availableSpots = availableSpots.toString().toBody(),
+                        totalSpots = totalSpots.toString().toBody(),
+                        latitude = latitude.toString().toBody(),
+                        longitude = longitude.toString().toBody(),
+                        existingImageUrl = existingImageUrl.toBody(),
+                        image = imagePart
+                    )
                 }
 
                 if (response.isSuccessful) {
@@ -95,6 +113,19 @@ class ParkingFormViewModel : ViewModel() {
             } finally {
                 _isSaving.value = false
             }
+        }
+    }
+
+    private suspend fun buildImagePart(uri: Uri): MultipartBody.Part? = withContext(Dispatchers.IO) {
+        try {
+            val contentResolver = getApplication<Application>().contentResolver
+            val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
+            val ext = if (mimeType.contains("png", ignoreCase = true)) ".png" else ".jpg"
+            val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
+            val requestFile = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("image", "parking$ext", requestFile)
+        } catch (e: Exception) {
+            null
         }
     }
 

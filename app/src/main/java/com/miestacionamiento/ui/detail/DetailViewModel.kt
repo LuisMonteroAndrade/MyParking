@@ -9,12 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.miestacionamiento.MiEstacionamientoApp
 import com.miestacionamiento.data.local.entity.ParkingEntity
 import com.miestacionamiento.data.model.BookingResponse
-import com.miestacionamiento.data.model.CreateBookingRequest
 import com.miestacionamiento.data.model.CreateReviewRequest
+import com.miestacionamiento.data.model.FlowPaymentRequest
 import com.miestacionamiento.data.model.Review
 import com.miestacionamiento.data.model.StartConversationRequest
 import com.miestacionamiento.data.remote.RetrofitClient
 import com.miestacionamiento.utils.PreferencesManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -47,6 +49,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _chatConversationId = MutableLiveData<Int?>()
     val chatConversationId: LiveData<Int?> = _chatConversationId
+
+    private val _flowPaymentUrl = MutableLiveData<String?>()
+    val flowPaymentUrl: LiveData<String?> = _flowPaymentUrl
+
+    private var pollingJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -117,23 +124,26 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun createBooking(parkingId: Int, hours: Int, paymentToken: String, isGooglePay: Boolean) {
+    fun createFlowPayment(parkingId: Int, hours: Int) {
         _isBookingLoading.value = true
         viewModelScope.launch {
             try {
-                val request = CreateBookingRequest(
-                    parkingId = parkingId,
-                    hours = hours,
-                    paymentToken = paymentToken,
-                    paymentMethod = if (isGooglePay) "GOOGLE_PAY" else "PENDING"
-                )
-                val response = api.createBooking(request)
+                val response = api.createFlowPayment(FlowPaymentRequest(parkingId, hours))
                 if (response.isSuccessful) {
-                    _bookingResult.value = BookingResult.Success(response.body()!!)
+                    val body = response.body()!!
+                    _flowPaymentUrl.value = body.paymentUrl
+                    startStatusPolling(body.bookingId)
                 } else {
-                    _bookingResult.value = BookingResult.Error("No se pudo confirmar la reserva")
+                    val errorMsg = when (response.code()) {
+                        400 -> "Datos de reserva inválidos"
+                        404 -> "Estacionamiento no disponible"
+                        503 -> "Sistema de pago no configurado"
+                        else -> "No se pudo crear el pago"
+                    }
+                    _bookingResult.value = BookingResult.Error(errorMsg)
                 }
             } catch (e: Exception) {
+                Log.e("DetailVM", "Error creando pago Flow", e)
                 _bookingResult.value = BookingResult.Error("Error de conexión")
             } finally {
                 _isBookingLoading.value = false
@@ -141,8 +151,48 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    private fun startStatusPolling(bookingId: Int) {
+        pollingJob?.cancel()
+        pollingJob = viewModelScope.launch {
+            var attempts = 0
+            while (attempts < 100) {
+                delay(3000)
+                attempts++
+                try {
+                    val response = api.getBookingStatus(bookingId)
+                    if (response.isSuccessful) {
+                        val booking = response.body() ?: continue
+                        when (booking.status) {
+                            "COMPLETED" -> {
+                                _bookingResult.value = BookingResult.Success(booking)
+                                return@launch
+                            }
+                            "FAILED" -> {
+                                _bookingResult.value = BookingResult.Error("El pago fue rechazado")
+                                return@launch
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("DetailVM", "Error en polling de pago", e)
+                }
+            }
+            _bookingResult.value = BookingResult.Error("Tiempo de espera agotado. Si ya pagaste, tu reserva se confirmará en breve.")
+        }
+    }
+
+    fun stopPaymentPolling() {
+        pollingJob?.cancel()
+        pollingJob = null
+    }
+
+    fun clearFlowPaymentUrl() {
+        _flowPaymentUrl.value = null
+    }
+
     fun clearBookingResult() {
         _bookingResult.value = null
+        stopPaymentPolling()
     }
 
     sealed class BookingResult {

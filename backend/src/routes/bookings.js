@@ -92,6 +92,39 @@ router.post('/', async (req, res) => {
   }
 });
 
+// GET /api/bookings/:id/status - estado de una reserva específica (para polling de Flow)
+router.get('/:id/status', async (req, res) => {
+  try {
+    const bookingId = parseInt(req.params.id);
+    const driverId = req.user.id;
+
+    const result = await executeQuery(
+      `SELECT b.ID, b.PARKING_ID, b.DRIVER_ID, b.AMOUNT, b.STATUS, b.HOURS, b.CREATED_AT
+       FROM BOOKINGS b
+       WHERE b.ID = :bookingId AND b.DRIVER_ID = :driverId`,
+      { bookingId, driverId }
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Reserva no encontrada' });
+    }
+
+    const row = result.rows[0];
+    res.json({
+      id: row.ID,
+      parkingId: row.PARKING_ID,
+      driverId: row.DRIVER_ID,
+      amount: Number(row.AMOUNT),
+      status: row.STATUS,
+      hours: Number(row.HOURS),
+      createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
+    });
+  } catch (error) {
+    console.error('Error al obtener estado de reserva:', error.message);
+    res.status(500).json({ error: 'Error al obtener el estado' });
+  }
+});
+
 // GET /api/bookings/my - historial de reservas del conductor
 router.get('/my', async (req, res) => {
   try {

@@ -22,7 +22,18 @@ data class CreateBookingRequest(
     val parkingId: Int,
     val hours: Int,
     val paymentToken: String,
-    val paymentMethod: String = "GOOGLE_PAY"
+    val paymentMethod: String = "FLOW"
+)
+
+data class FlowPaymentRequest(
+    val parkingId: Int,
+    val hours: Int
+)
+
+data class FlowPaymentResponse(
+    val bookingId: Int,
+    val paymentUrl: String,
+    val amount: Double
 )
 
 data class BookingResponse(

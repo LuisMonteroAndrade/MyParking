@@ -86,8 +86,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:18.2.0'
     implementation 'com.google.android.gms:play-services-location:21.1.0'
 
-    // Google Pay
-    implementation 'com.google.android.gms:play-services-wallet:19.3.0'
+    // Chrome Custom Tabs (para abrir el pago de Flow en navegador integrado)
+    implementation 'androidx.browser:browser:1.8.0'
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'

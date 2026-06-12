@@ -31,6 +31,9 @@ interface ParkingDao {
     @Query("SELECT id FROM parkings WHERE isSaved = 1")
     suspend fun getSavedParkingIds(): List<Int>
 
+    @Query("SELECT id FROM parkings WHERE isRecentlyViewed = 1")
+    suspend fun getRecentlyViewedParkingIds(): List<Int>
+
     @Query("UPDATE parkings SET isSaved = :isSaved WHERE id = :id")
     suspend fun updateSavedStatus(id: Int, isSaved: Boolean)
 

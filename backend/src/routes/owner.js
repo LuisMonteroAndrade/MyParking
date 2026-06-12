@@ -1,8 +1,41 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const { executeQuery, oracledb } = require('../config/database');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
 const router = express.Router();
+
+// Configuración de multer para imágenes de estacionamiento
+const uploadDir = path.join(__dirname, '../../uploads');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `parking_${Date.now()}_${Math.random().toString(36).substr(2, 6)}${ext}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowed.includes(ext)) cb(null, true);
+    else cb(new Error('Solo se permiten imágenes JPG, JPEG y PNG'));
+  }
+});
+
+const uploadMiddleware = (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    next();
+  });
+};
 
 function requireOwner(req, res, next) {
   if (req.user.userType !== 'OWNER') {
@@ -48,13 +81,18 @@ router.get('/parkings', async (req, res) => {
 });
 
 // POST /api/owner/parkings
-router.post('/parkings', async (req, res) => {
+router.post('/parkings', uploadMiddleware, async (req, res) => {
   try {
-    const { name, description, address, pricePerHour, availableSpots, totalSpots, latitude, longitude, imageUrl } = req.body;
+    const { name, description, address, pricePerHour, availableSpots, totalSpots, latitude, longitude } = req.body;
 
     if (!name || !address || pricePerHour === undefined || pricePerHour === null) {
       return res.status(400).json({ error: 'Nombre, direccion y precio son requeridos' });
     }
+    if (!req.file) {
+      return res.status(400).json({ error: 'La imagen del estacionamiento es obligatoria' });
+    }
+
+    const imageUrl = `${process.env.SERVER_URL}/uploads/${req.file.filename}`;
 
     const result = await executeQuery(
       `INSERT INTO PARKINGS (NAME, DESCRIPTION, ADDRESS, IMAGE_URL, LATITUDE, LONGITUDE,
@@ -66,7 +104,7 @@ router.post('/parkings', async (req, res) => {
         name: name.trim(),
         description: description ? description.trim() : null,
         address: address.trim(),
-        imageUrl: imageUrl ? imageUrl.trim() : null,
+        imageUrl,
         latitude: parseFloat(latitude) || 0,
         longitude: parseFloat(longitude) || 0,
         pricePerHour: parseFloat(pricePerHour) || 0,
@@ -88,12 +126,15 @@ router.post('/parkings', async (req, res) => {
 });
 
 // PUT /api/owner/parkings/:id
-router.put('/parkings/:id', async (req, res) => {
+router.put('/parkings/:id', uploadMiddleware, async (req, res) => {
   try {
     const parkingId = parseInt(req.params.id);
     if (isNaN(parkingId)) return res.status(400).json({ error: 'ID invalido' });
 
-    const { name, description, address, pricePerHour, availableSpots, totalSpots, latitude, longitude, imageUrl } = req.body;
+    const { name, description, address, pricePerHour, availableSpots, totalSpots, latitude, longitude, existingImageUrl } = req.body;
+    const imageUrl = req.file
+      ? `${process.env.SERVER_URL}/uploads/${req.file.filename}`
+      : (existingImageUrl || null);
 
     const check = await executeQuery(
       'SELECT ID FROM PARKINGS WHERE ID = :id AND OWNER_ID = :ownerId',
@@ -113,7 +154,7 @@ router.put('/parkings/:id', async (req, res) => {
         name: name ? name.trim() : '',
         description: description ? description.trim() : null,
         address: address ? address.trim() : '',
-        imageUrl: imageUrl ? imageUrl.trim() : null,
+        imageUrl: imageUrl || null,
         latitude: parseFloat(latitude) || 0,
         longitude: parseFloat(longitude) || 0,
         pricePerHour: parseFloat(pricePerHour) || 0,

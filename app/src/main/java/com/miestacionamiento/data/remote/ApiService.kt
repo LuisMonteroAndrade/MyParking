@@ -4,8 +4,11 @@ import com.miestacionamiento.data.model.AuthResponse
 import com.miestacionamiento.data.model.BookingResponse
 import com.miestacionamiento.data.model.Conversation
 import com.miestacionamiento.data.model.CreateBookingRequest
+import com.miestacionamiento.data.model.FlowPaymentRequest
+import com.miestacionamiento.data.model.FlowPaymentResponse
 import com.miestacionamiento.data.model.CreateMessageRequest
-import com.miestacionamiento.data.model.CreateParkingRequest
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import com.miestacionamiento.data.model.CreateReviewRequest
 import com.miestacionamiento.data.model.DeleteResponse
 import com.miestacionamiento.data.model.LoginRequest
@@ -26,9 +29,11 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -85,13 +90,34 @@ interface ApiService {
     @GET("owner/parkings")
     suspend fun getOwnerParkings(): Response<List<OwnerParking>>
 
+    @Multipart
     @POST("owner/parkings")
-    suspend fun createParking(@Body request: CreateParkingRequest): Response<OwnerParking>
+    suspend fun createParking(
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("address") address: RequestBody,
+        @Part("pricePerHour") pricePerHour: RequestBody,
+        @Part("availableSpots") availableSpots: RequestBody,
+        @Part("totalSpots") totalSpots: RequestBody,
+        @Part("latitude") latitude: RequestBody,
+        @Part("longitude") longitude: RequestBody,
+        @Part image: MultipartBody.Part
+    ): Response<OwnerParking>
 
+    @Multipart
     @PUT("owner/parkings/{id}")
     suspend fun updateParking(
         @Path("id") id: Int,
-        @Body request: CreateParkingRequest
+        @Part("name") name: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part("address") address: RequestBody,
+        @Part("pricePerHour") pricePerHour: RequestBody,
+        @Part("availableSpots") availableSpots: RequestBody,
+        @Part("totalSpots") totalSpots: RequestBody,
+        @Part("latitude") latitude: RequestBody,
+        @Part("longitude") longitude: RequestBody,
+        @Part("existingImageUrl") existingImageUrl: RequestBody,
+        @Part image: MultipartBody.Part?
     ): Response<OwnerParking>
 
     @DELETE("owner/parkings/{id}")
@@ -110,6 +136,14 @@ interface ApiService {
 
     @POST("bookings")
     suspend fun createBooking(@Body request: CreateBookingRequest): Response<BookingResponse>
+
+    @GET("bookings/{id}/status")
+    suspend fun getBookingStatus(@Path("id") id: Int): Response<BookingResponse>
+
+    // --- Pagos Flow ---
+
+    @POST("payments/flow/create")
+    suspend fun createFlowPayment(@Body request: FlowPaymentRequest): Response<FlowPaymentResponse>
 
     // --- Reseñas ---
 

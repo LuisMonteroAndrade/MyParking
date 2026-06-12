@@ -21,7 +21,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="@drawable/bg_circle_translucent"
+            app:cardBackgroundColor="?attr/colorPrimaryContainer"
             app:cardElevation="0dp">
 
             <ImageView

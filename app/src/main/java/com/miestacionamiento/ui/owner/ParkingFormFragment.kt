@@ -1,11 +1,17 @@
 package com.miestacionamiento.ui.owner
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,9 +26,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.miestacionamiento.R
 import com.miestacionamiento.data.model.OwnerParking
 import com.miestacionamiento.databinding.FragmentParkingFormBinding
+import com.miestacionamiento.utils.gone
+import com.miestacionamiento.utils.loadUrl
+import com.miestacionamiento.utils.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.Locale
 
 class ParkingFormFragment : Fragment(), OnMapReadyCallback {
@@ -39,9 +49,40 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
     private var mapViewBundle: Bundle? = null
     private var selectedLat = 0.0
     private var selectedLng = 0.0
+    private var selectedImageUri: Uri? = null
+    private var existingImageUrl: String = ""
+    private var cameraImageUri: Uri? = null
 
     companion object {
         private const val MAP_VIEW_BUNDLE_KEY = "FormMapBundle"
+    }
+
+    // Lanzador de galería
+    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            selectedImageUri = it
+            binding.ivParkingPreview.setImageURI(it)
+            binding.ivParkingPreview.visible()
+            binding.layoutImagePlaceholder.gone()
+            binding.tvImageError.gone()
+        }
+    }
+
+    // Lanzador de cámara
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success && cameraImageUri != null) {
+            selectedImageUri = cameraImageUri
+            binding.ivParkingPreview.setImageURI(cameraImageUri)
+            binding.ivParkingPreview.visible()
+            binding.layoutImagePlaceholder.gone()
+            binding.tvImageError.gone()
+        }
+    }
+
+    // Lanzador de permiso de cámara
+    private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) launchCamera()
+        else Snackbar.make(binding.root, "Se necesita permiso de cámara", Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onCreateView(
@@ -57,6 +98,7 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
 
         setupRegionDropdown()
         setupMapView()
+        setupImagePicker()
 
         if (isEditMode) {
             binding.tvFormTitle.setText(R.string.form_edit_parking_title)
@@ -67,6 +109,31 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
         observeViewModel()
         binding.btnSubmit.setOnClickListener { submitForm() }
         binding.btnLocate.setOnClickListener { geocodeAddress() }
+    }
+
+    private fun setupImagePicker() {
+        binding.btnPickGallery.setOnClickListener {
+            galleryLauncher.launch("image/*")
+        }
+        binding.btnTakePhoto.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                launchCamera()
+            } else {
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+
+    private fun launchCamera() {
+        val tempFile = File(requireContext().cacheDir, "parking_photo_${System.currentTimeMillis()}.jpg")
+        cameraImageUri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.provider",
+            tempFile
+        )
+        cameraLauncher.launch(cameraImageUri!!)
     }
 
     private fun setupRegionDropdown() {
@@ -224,7 +291,12 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
         binding.etPrice.setText(parking.pricePerHour.toInt().toString())
         binding.etAvailableSpots.setText(parking.availableSpots.toString())
         binding.etTotalSpots.setText(parking.totalSpots.toString())
-        binding.etImageUrl.setText(parking.imageUrl)
+        existingImageUrl = parking.imageUrl
+        if (parking.imageUrl.isNotEmpty()) {
+            binding.ivParkingPreview.loadUrl(parking.imageUrl)
+            binding.ivParkingPreview.visible()
+            binding.layoutImagePlaceholder.gone()
+        }
         if (parking.latitude != 0.0 && parking.longitude != 0.0) {
             selectedLat = parking.latitude
             selectedLng = parking.longitude
@@ -244,7 +316,6 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
         val priceStr = binding.etPrice.text?.toString()?.trim() ?: ""
         val availableSpotsStr = binding.etAvailableSpots.text?.toString()?.trim() ?: ""
         val totalSpotsStr = binding.etTotalSpots.text?.toString()?.trim() ?: ""
-        val imageUrl = binding.etImageUrl.text?.toString()?.trim() ?: ""
 
         var valid = true
 
@@ -261,25 +332,31 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
             binding.tilPrice.error = getString(R.string.error_invalid_price)
             valid = false
         }
+        if (!isEditMode && selectedImageUri == null) {
+            binding.tvImageError.visible()
+            valid = false
+        }
 
         if (!valid) return
 
-        val availableSpots = availableSpotsStr.toIntOrNull() ?: 0
-        val totalSpots = totalSpotsStr.toIntOrNull() ?: 0
+        val fullAddress = buildString {
+            append(address)
+            if (commune.isNotEmpty()) append(", $commune")
+            if (region.isNotEmpty()) append(", $region")
+        }
 
         viewModel.saveParking(
             parkingId = args.parkingId,
             name = name,
+            fullAddress = fullAddress,
             description = description,
-            address = address,
-            commune = commune,
-            region = region,
             pricePerHour = price!!,
-            availableSpots = availableSpots,
-            totalSpots = totalSpots,
-            imageUrl = imageUrl,
+            availableSpots = availableSpotsStr.toIntOrNull() ?: 0,
+            totalSpots = totalSpotsStr.toIntOrNull() ?: 0,
             latitude = selectedLat,
-            longitude = selectedLng
+            longitude = selectedLng,
+            imageUri = selectedImageUri,
+            existingImageUrl = existingImageUrl
         )
     }
 
@@ -287,6 +364,7 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
         binding.tilName.error = null
         binding.tilAddress.error = null
         binding.tilPrice.error = null
+        binding.tvImageError.gone()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -297,30 +375,11 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
         _binding?.mapViewForm?.onSaveInstanceState(mapBundle)
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.mapViewForm.onResume()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        binding.mapViewForm.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        binding.mapViewForm.onStop()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        binding.mapViewForm.onPause()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        binding.mapViewForm.onLowMemory()
-    }
+    override fun onResume() { super.onResume(); binding.mapViewForm.onResume() }
+    override fun onStart() { super.onStart(); binding.mapViewForm.onStart() }
+    override fun onStop() { super.onStop(); binding.mapViewForm.onStop() }
+    override fun onPause() { super.onPause(); binding.mapViewForm.onPause() }
+    override fun onLowMemory() { super.onLowMemory(); binding.mapViewForm.onLowMemory() }
 
     override fun onDestroyView() {
         _binding?.mapViewForm?.onDestroy()

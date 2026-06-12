@@ -142,31 +142,28 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Botón Google Pay -->
+    <!-- Botón Pagar con Flow -->
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnGooglePay"
+        android:id="@+id/btnFlowPay"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="16dp"
-        android:text="Pagar con Google Pay"
+        android:text="Pagar con Flow"
         android:textColor="@android:color/white"
-        android:backgroundTint="#000000"
+        android:backgroundTint="#00A651"
         app:cornerRadius="28dp"
-        app:icon="@drawable/ic_google_pay"
-        app:iconTint="@android:color/white"
         app:iconGravity="start"
-        app:iconPadding="8dp"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        app:iconPadding="8dp" />
 
-    <!-- Botón reservar sin pago digital -->
+    <!-- Botón de carga (invisible hasta que se necesite) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnConfirmBooking"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="8dp"
         android:text="Reservar"
-        app:cornerRadius="28dp" />
+        app:cornerRadius="28dp"
+        android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCancelSheet"

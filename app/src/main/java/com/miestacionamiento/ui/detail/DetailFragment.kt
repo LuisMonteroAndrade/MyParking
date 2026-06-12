@@ -1,29 +1,25 @@
 package com.miestacionamiento.ui.detail
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.wallet.AutoResolveHelper
-import com.google.android.gms.wallet.IsReadyToPayRequest
-import com.google.android.gms.wallet.PaymentData
-import com.google.android.gms.wallet.PaymentDataRequest
-import com.google.android.gms.wallet.Wallet
-import com.google.android.gms.wallet.WalletConstants
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.miestacionamiento.R
@@ -32,7 +28,6 @@ import com.miestacionamiento.databinding.DialogAddReviewBinding
 import com.miestacionamiento.databinding.FragmentDetailBinding
 import com.miestacionamiento.databinding.LayoutBookingSheetBinding
 import com.miestacionamiento.ui.reviews.ReviewAdapter
-import com.miestacionamiento.utils.GooglePayHelper
 import com.miestacionamiento.utils.gone
 import com.miestacionamiento.utils.loadUrl
 import com.miestacionamiento.utils.toCurrencyString
@@ -50,14 +45,8 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
     private var currentParking: ParkingEntity? = null
 
-    private lateinit var paymentsClient: com.google.android.gms.wallet.PaymentsClient
-    private var googlePayAvailable = false
     private var selectedHours = 1
     private var bookingSheet: BottomSheetDialog? = null
-
-    companion object {
-        private const val LOAD_PAYMENT_DATA_REQUEST_CODE = 991
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentDetailBinding.inflate(inflater, container, false)
@@ -70,7 +59,6 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
         binding.mapView.onCreate(savedInstanceState)
         binding.mapView.getMapAsync(this)
 
-        setupGooglePay()
         setupReviews()
         viewModel.loadParking(args.parkingId)
 
@@ -79,6 +67,13 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
                 currentParking = it
                 bindParking(it)
             }
+        }
+
+        viewModel.flowPaymentUrl.observe(viewLifecycleOwner) { url ->
+            url ?: return@observe
+            bookingSheet?.dismiss()
+            openFlowPayment(url)
+            viewModel.clearFlowPaymentUrl()
         }
 
         viewModel.bookingResult.observe(viewLifecycleOwner) { result ->
@@ -162,23 +157,6 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
         dialog.show()
     }
 
-    private fun setupGooglePay() {
-        val options = Wallet.WalletOptions.Builder()
-            .setEnvironment(WalletConstants.ENVIRONMENT_TEST)
-            .build()
-        paymentsClient = Wallet.getPaymentsClient(requireActivity(), options)
-
-        val request = IsReadyToPayRequest.fromJson(GooglePayHelper.isReadyToPayRequest.toString())
-        paymentsClient.isReadyToPay(request)
-            .addOnCompleteListener { task ->
-                googlePayAvailable = try {
-                    task.getResult(ApiException::class.java) == true
-                } catch (e: ApiException) {
-                    false
-                }
-            }
-    }
-
     private fun showBookingSheet() {
         val parking = currentParking ?: return
         if (parking.availableSpots == 0) {
@@ -211,18 +189,14 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        if (googlePayAvailable) {
-            sheetBinding.btnGooglePay.visibility = View.VISIBLE
-            sheetBinding.btnGooglePay.setOnClickListener {
-                requestGooglePayment(parking.pricePerHour * selectedHours)
-            }
-        }
-
-        sheetBinding.btnConfirmBooking.setOnClickListener {
-            viewModel.createBooking(parking.id, selectedHours, "", isGooglePay = false)
+        sheetBinding.btnFlowPay.setOnClickListener {
+            sheetBinding.btnFlowPay.isEnabled = false
+            sheetBinding.btnFlowPay.text = "Procesando..."
+            viewModel.createFlowPayment(parking.id, selectedHours)
         }
 
         sheetBinding.btnCancelSheet.setOnClickListener {
+            viewModel.stopPaymentPolling()
             dialog.dismiss()
         }
 
@@ -235,40 +209,21 @@ class DetailFragment : Fragment(), OnMapReadyCallback {
         sheetBinding.tvSheetTotal.text = "$${fmt.format(total.toLong())}"
     }
 
-    private fun requestGooglePayment(totalAmount: Double) {
-        val paymentDataRequestJson = GooglePayHelper.createPaymentDataRequest(totalAmount)
-        val request = PaymentDataRequest.fromJson(paymentDataRequestJson)
-        AutoResolveHelper.resolveTask(
-            paymentsClient.loadPaymentData(request),
-            requireActivity(),
-            LOAD_PAYMENT_DATA_REQUEST_CODE
-        )
-    }
-
-    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == LOAD_PAYMENT_DATA_REQUEST_CODE) {
-            when (resultCode) {
-                Activity.RESULT_OK -> {
-                    val paymentData = PaymentData.getFromIntent(data!!)
-                    val token = paymentData?.toJson() ?: ""
-                    val parking = currentParking ?: return
-                    viewModel.createBooking(parking.id, selectedHours, token, isGooglePay = true)
-                }
-                Activity.RESULT_CANCELED -> {
-                    Snackbar.make(binding.root, "Pago cancelado", Snackbar.LENGTH_SHORT).show()
-                }
-                AutoResolveHelper.RESULT_ERROR -> {
-                    val status = AutoResolveHelper.getStatusFromIntent(data)
-                    Snackbar.make(
-                        binding.root,
-                        "Error en Google Pay: ${status?.statusMessage}",
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
-            }
+    private fun openFlowPayment(url: String) {
+        try {
+            val colorScheme = CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                .build()
+            val customTab = CustomTabsIntent.Builder()
+                .setDefaultColorSchemeParams(colorScheme)
+                .setShowTitle(true)
+                .build()
+            customTab.launchUrl(requireContext(), Uri.parse(url))
+        } catch (e: Exception) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
         }
+        Snackbar.make(binding.root, "Completa el pago y vuelve a la app", Snackbar.LENGTH_LONG).show()
     }
 
     private fun bindParking(parking: ParkingEntity) {

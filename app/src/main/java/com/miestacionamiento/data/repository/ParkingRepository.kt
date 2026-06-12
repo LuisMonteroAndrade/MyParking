@@ -25,10 +25,13 @@ class ParkingRepository(
             val response = api.getParkings(userId?.takeIf { it > 0 })
             if (response.isSuccessful) {
                 val apiParkings = response.body() ?: return@withContext
-                // Preservar isSaved local para no perder favoritos del usuario
                 val savedIds = dao.getSavedParkingIds().toSet()
+                val recentIds = dao.getRecentlyViewedParkingIds().toSet()
                 dao.upsertParkings(apiParkings.map { p ->
-                    p.toEntity().copy(isSaved = savedIds.contains(p.id) || p.isSaved)
+                    p.toEntity().copy(
+                        isSaved = savedIds.contains(p.id) || p.isSaved,
+                        isRecentlyViewed = recentIds.contains(p.id) || p.isRecentlyViewed
+                    )
                 })
             }
         } catch (e: Exception) {
@@ -50,6 +53,11 @@ class ParkingRepository(
 
     suspend fun markRecentlyViewed(id: Int) = withContext(Dispatchers.IO) {
         dao.updateRecentlyViewed(id, true)
+        try {
+            api.markAsViewed(id)
+        } catch (e: Exception) {
+            // Sin red: la visita queda registrada localmente
+        }
     }
 
     suspend fun getParkingById(id: Int): ParkingEntity? = withContext(Dispatchers.IO) {
