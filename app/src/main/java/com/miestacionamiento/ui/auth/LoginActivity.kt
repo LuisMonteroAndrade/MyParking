@@ -1,9 +1,14 @@
 package com.miestacionamiento.ui.auth
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.miestacionamiento.databinding.ActivityLoginBinding
@@ -19,6 +24,10 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: LoginViewModel by viewModels()
     private lateinit var prefsManager: PreferencesManager
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* resultado ignorado: el usuario puede cambiar esto en ajustes */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -26,8 +35,19 @@ class LoginActivity : AppCompatActivity() {
 
         prefsManager = PreferencesManager(this)
 
+        requestNotificationPermission()
         setupObservers()
         setupClicks()
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     private fun setupObservers() {
@@ -54,6 +74,7 @@ class LoginActivity : AppCompatActivity() {
                             commune = state.commune,
                             region = state.region
                         )
+                        viewModel.registerFcmToken()
                         navigateToMain()
                     }
                 }

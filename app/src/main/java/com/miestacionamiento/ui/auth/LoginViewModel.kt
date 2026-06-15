@@ -6,9 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.miestacionamiento.data.model.LoginRequest
 import com.miestacionamiento.data.remote.RetrofitClient
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class LoginViewModel : ViewModel() {
 
@@ -59,6 +61,17 @@ class LoginViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("LoginViewModel", "Error de conexión: ${e.javaClass.simpleName}: ${e.message}", e)
                 _state.value = AuthState.Error("No se pudo conectar al servidor. Verifica que el backend esté corriendo.")
+            }
+        }
+    }
+
+    fun registerFcmToken() {
+        viewModelScope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                api.registerFcmToken(mapOf("token" to token))
+            } catch (e: Exception) {
+                Log.e("LoginVM", "Error registrando FCM token", e)
             }
         }
     }

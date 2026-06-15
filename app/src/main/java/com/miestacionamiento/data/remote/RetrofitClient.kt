@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-        private const val BASE_URL = "http://161.153.192.177:3000/api/"
+    private const val BASE_URL = "http://161.153.192.177:3000/api/"
 
     val authInterceptor = AuthInterceptor()
 

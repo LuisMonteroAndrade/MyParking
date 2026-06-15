@@ -1,8 +1,10 @@
 package com.miestacionamiento.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.miestacionamiento.R
@@ -61,15 +63,17 @@ class MainActivity : AppCompatActivity() {
 
         binding.bottomNav.setupWithNavController(navController)
 
+        handleNotificationIntent(intent, navController)
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.detailFragment, R.id.parkingFormFragment,
-                R.id.chatFragment, R.id.reviewsOwnerFragment -> binding.bottomNav.gone()
+                R.id.chatFragment, R.id.reviewsOwnerFragment,
+                R.id.bookingHistoryFragment -> binding.bottomNav.gone()
                 else -> binding.bottomNav.visible()
             }
         }
 
-        // Al presionar Atrás desde cualquier tab que no sea Inicio, regresar al Inicio
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val currentId = navController.currentDestination?.id
@@ -81,5 +85,31 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment ?: return
+        handleNotificationIntent(intent, navHostFragment.navController)
+    }
+
+    private fun handleNotificationIntent(intent: Intent?, navController: NavController) {
+        val type = intent?.getStringExtra("notification_type") ?: return
+        val extraId = intent.getIntExtra("notification_extra_id", 0)
+        when (type) {
+            "NEW_MESSAGE" -> {
+                binding.bottomNav.selectedItemId = R.id.chatListFragment
+            }
+            "NEW_BOOKING", "PAYMENT_RECEIVED", "PARKING_FULL" -> {
+                binding.bottomNav.selectedItemId = R.id.ownerDashboardFragment
+            }
+            "NEW_REVIEW" -> {
+                binding.bottomNav.selectedItemId = R.id.chatListFragment
+            }
+            "BOOKING_CONFIRMED", "BOOKING_FAILED", "BOOKING_EXPIRING", "REVIEW_REMINDER" -> {
+                binding.bottomNav.selectedItemId = R.id.homeFragment
+            }
+        }
     }
 }

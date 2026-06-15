@@ -14,6 +14,7 @@ import com.miestacionamiento.data.model.FlowPaymentRequest
 import com.miestacionamiento.data.model.Review
 import com.miestacionamiento.data.model.StartConversationRequest
 import com.miestacionamiento.data.remote.RetrofitClient
+import com.miestacionamiento.utils.NotificationHelper
 import com.miestacionamiento.utils.PreferencesManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -54,6 +55,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val flowPaymentUrl: LiveData<String?> = _flowPaymentUrl
 
     private var pollingJob: Job? = null
+    private var pendingHours: Int = 1
 
     init {
         viewModelScope.launch {
@@ -131,6 +133,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 val response = api.createFlowPayment(FlowPaymentRequest(parkingId, hours))
                 if (response.isSuccessful) {
                     val body = response.body()!!
+                    pendingHours = hours
                     _flowPaymentUrl.value = body.paymentUrl
                     startStatusPolling(body.bookingId)
                 } else {
@@ -164,10 +167,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         val booking = response.body() ?: continue
                         when (booking.status) {
                             "COMPLETED" -> {
+                                NotificationHelper.showBookingConfirmed(
+                                    getApplication(),
+                                    _parking.value?.name ?: "el estacionamiento",
+                                    pendingHours,
+                                    bookingId
+                                )
                                 _bookingResult.value = BookingResult.Success(booking)
                                 return@launch
                             }
                             "FAILED" -> {
+                                NotificationHelper.showBookingFailed(getApplication(), bookingId)
                                 _bookingResult.value = BookingResult.Error("El pago fue rechazado")
                                 return@launch
                             }

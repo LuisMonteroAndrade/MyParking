@@ -23,6 +23,9 @@ import com.google.android.material.textfield.TextInputLayout
 import com.miestacionamiento.R
 import com.miestacionamiento.databinding.FragmentProfileBinding
 import com.miestacionamiento.ui.auth.LoginActivity
+import com.miestacionamiento.utils.gone
+import com.miestacionamiento.utils.visible
+import androidx.navigation.fragment.findNavController
 
 class ProfileFragment : Fragment() {
 
@@ -110,7 +113,14 @@ class ProfileFragment : Fragment() {
         viewModel.vehicleBrand.observe(viewLifecycleOwner) { currentVehicleBrand = it }
         viewModel.licensePlate.observe(viewLifecycleOwner) { currentLicensePlate = it }
         viewModel.vehiclePhotoUri.observe(viewLifecycleOwner) { currentVehiclePhotoUri = it }
-        viewModel.userType.observe(viewLifecycleOwner) { currentUserType = it }
+        viewModel.userType.observe(viewLifecycleOwner) { type ->
+            currentUserType = type
+            if (type == "OWNER") {
+                binding.cardBookingHistory.gone()
+            } else {
+                binding.cardBookingHistory.visible()
+            }
+        }
         viewModel.userAddress.observe(viewLifecycleOwner) { currentAddress = it }
         viewModel.userCommune.observe(viewLifecycleOwner) { currentCommune = it }
         viewModel.userRegion.observe(viewLifecycleOwner) { currentRegion = it }
@@ -139,6 +149,12 @@ class ProfileFragment : Fragment() {
         binding.chipEn.setOnClickListener { viewModel.setLanguage("en") }
 
         binding.cardPersonalInfo.setOnClickListener { showPersonalInfoDialog() }
+        binding.cardBookingHistory.setOnClickListener {
+            findNavController().navigate(
+                com.miestacionamiento.ui.profile.ProfileFragmentDirections
+                    .actionProfileToBookingHistory()
+            )
+        }
         binding.btnEditProfile.setOnClickListener { showEditProfileDialog() }
         binding.btnLogout.setOnClickListener { showLogoutDialog() }
     }

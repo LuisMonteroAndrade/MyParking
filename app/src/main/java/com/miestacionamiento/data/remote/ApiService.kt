@@ -11,6 +11,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import com.miestacionamiento.data.model.CreateReviewRequest
 import com.miestacionamiento.data.model.DeleteResponse
+import com.miestacionamiento.data.model.DriverBooking
 import com.miestacionamiento.data.model.LoginRequest
 import com.miestacionamiento.data.model.Message
 import com.miestacionamiento.data.model.OwnerDashboardData
@@ -82,6 +83,9 @@ interface ApiService {
     @GET("users/profile")
     suspend fun getProfile(): Response<UserProfile>
 
+    @POST("users/fcm-token")
+    suspend fun registerFcmToken(@Body body: Map<String, String>): Response<Void>
+
     @PUT("users/profile")
     suspend fun updateProfile(@Body profile: Map<String, String?>): Response<UserProfile>
 
@@ -133,6 +137,9 @@ interface ApiService {
     suspend fun getOwnerDashboard(): Response<OwnerDashboardData>
 
     // --- Reservas (Conductor) ---
+
+    @GET("bookings/my")
+    suspend fun getMyBookings(): Response<List<DriverBooking>>
 
     @POST("bookings")
     suspend fun createBooking(@Body request: CreateBookingRequest): Response<BookingResponse>
