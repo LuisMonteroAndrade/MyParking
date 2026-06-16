@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Permite HTTP (no HTTPS) para el backend local durante desarrollo -->
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true">
-        <trust-anchors>
-            <certificates src="system" />
-        </trust-anchors>
-    </base-config>
-</network-security-config>

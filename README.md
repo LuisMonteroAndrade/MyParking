@@ -1,35 +1,24 @@
 Proyecto "Mi Estacionamiento"
 
-  MiEstacionamiento/
-  ├── settings.gradle / build.gradle / gradle.properties
-  ├── local.properties          ← Aquí pones tu API Key de Google Maps
-  └── app/
-      ├── build.gradle
-      └── src/main/
-          ├── AndroidManifest.xml
-          ├── java/com/miestacionamiento/
-          │   ├── MiEstacionamientoApp.kt       ← Application class con Room
-          │   ├── data/
-          │   │   ├── model/       Parking.kt, User.kt
-          │   │   ├── local/       AppDatabase, ParkingDao, ParkingEntity
-          │   │   ├── remote/      ApiService (Retrofit), RetrofitClient
-          │   │   └── repository/  ParkingRepository (con 8 parkings mock)
-          │   ├── ui/
-          │   │   ├── auth/        LoginActivity + VM, RegisterActivity + VM
-          │   │   ├── main/        MainActivity (BottomNav + NavController)
-          │   │   ├── home/        HomeFragment + VM + Adapter horizontal
-          │   │   ├── explore/     ExploreFragment + VM + ParkingAdapter
-          │   │   ├── detail/      DetailFragment + VM (Google Maps integrado)
-          │   │   ├── saved/       SavedFragment + VM + grilla adaptador
-          │   │   └── profile/     ProfileFragment + VM (idioma + dark mode)
-          │   └── utils/           Extensions.kt, PreferencesManager (DataStore)
-          └── res/
-              ├── layout/          11 layouts (actividades + fragments + items)
-              ├── navigation/      nav_graph.xml con Safe Args
-              ├── menu/            bottom_nav_menu.xml
-              ├── drawable/        22 íconos vectoriales + backgrounds
-              ├── anim/            4 animaciones slide
-              └── values/          strings, colors, themes (light+dark), dimens
+  Mi_Estacionamiento/
+│
+├── Documentacion/
+│   ├── Diagrama/
+│   ├── BDD
+│   ├── MyParking
+│   └── README.md
+│
+├── Producto/
+│   ├── Codigo_Fuente/
+│   ├── Base_Datos/
+│   ├── Librerias/
+│   └── APK/
+│
+├── Gestion/
+│   ├── 1.1.2 Documento de registro de definición e identificación del proyecto.docx
+│   └── Integrantes.txt
+│
+└── README.md
 
   Pasos para abrir en Android Studio
 

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <!-- Dashboard del propietario (inicio admin) -->
+    <fragment
+        android:id="@+id/ownerDashboardFragment"
+        android:name="com.miestacionamiento.ui.owner.OwnerDashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_owner_dashboard" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.miestacionamiento.ui.home.HomeFragment"
+        android:label="Inicio"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_home_to_detail"
+            app:destination="@id/detailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exploreFragment"
+        android:name="com.miestacionamiento.ui.explore.ExploreFragment"
+        android:label="Explorar"
+        tools:layout="@layout/fragment_explore">
+        <action
+            android:id="@+id/action_explore_to_detail"
+            app:destination="@id/detailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/savedFragment"
+        android:name="com.miestacionamiento.ui.saved.SavedFragment"
+        android:label="Guardados"
+        tools:layout="@layout/fragment_saved">
+        <action
+            android:id="@+id/action_saved_to_detail"
+            app:destination="@id/detailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.miestacionamiento.ui.profile.ProfileFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profile_to_bookingHistory"
+            app:destination="@id/bookingHistoryFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookingHistoryFragment"
+        android:name="com.miestacionamiento.ui.history.BookingHistoryFragment"
+        android:label="Mis Reservas"
+        tools:layout="@layout/fragment_booking_history">
+        <action
+            android:id="@+id/action_bookingHistory_to_detail"
+            app:destination="@id/detailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.miestacionamiento.ui.detail.DetailFragment"
+        android:label="Detalle"
+        tools:layout="@layout/fragment_detail">
+        <argument
+            android:name="parkingId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_detail_to_chat"
+            app:destination="@id/chatFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <!-- Chat -->
+    <fragment
+        android:id="@+id/chatListFragment"
+        android:name="com.miestacionamiento.ui.chat.ChatListFragment"
+        android:label="Mensajes"
+        tools:layout="@layout/fragment_chat_list">
+        <action
+            android:id="@+id/action_chatList_to_chat"
+            app:destination="@id/chatFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.miestacionamiento.ui.chat.ChatFragment"
+        android:label="Chat"
+        tools:layout="@layout/fragment_chat">
+        <argument
+            android:name="conversationId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="chatTitle"
+            app:argType="string"
+            android:defaultValue="Chat" />
+    </fragment>
+
+    <!-- Reseñas del propietario -->
+    <fragment
+        android:id="@+id/reviewsOwnerFragment"
+        android:name="com.miestacionamiento.ui.reviews.ReviewsOwnerFragment"
+        android:label="Reseñas"
+        tools:layout="@layout/fragment_reviews_owner" />
+
+    <!-- Pantallas de propietario -->
+
+    <fragment
+        android:id="@+id/myParkingsFragment"
+        android:name="com.miestacionamiento.ui.owner.MyParkingsFragment"
+        android:label="Mis Propiedades"
+        tools:layout="@layout/fragment_my_parkings">
+        <action
+            android:id="@+id/action_myParkings_to_parkingForm"
+            app:destination="@id/parkingFormFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_myParkings_to_reviews"
+            app:destination="@id/reviewsOwnerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/parkingFormFragment"
+        android:name="com.miestacionamiento.ui.owner.ParkingFormFragment"
+        android:label="Publicar Estacionamiento"
+        tools:layout="@layout/fragment_parking_form">
+        <argument
+            android:name="parkingId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/ownerStatsFragment"
+        android:name="com.miestacionamiento.ui.owner.OwnerStatsFragment"
+        android:label="Estadísticas"
+        tools:layout="@layout/fragment_owner_stats" />
+
+</navigation>

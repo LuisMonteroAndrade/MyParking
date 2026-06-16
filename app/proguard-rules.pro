@@ -1,2 +1,0 @@
--keep class com.miestacionamiento.data.model.** { *; }
--keep class com.miestacionamiento.data.local.entity.** { *; }

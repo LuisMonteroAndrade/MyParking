@@ -1,0 +1,101 @@
+================================================================
+       MIESTACIONAMIENTO - IDEAS Y ACTUALIZACIONES FUTURAS
+================================================================
+
+----------------------------------------------------------------
+ MEJORAS PRIORITARIAS (corto plazo)
+----------------------------------------------------------------
+
+1. NOTIFICACIONES PUSH
+   - Notificar al usuario cuando su reserva está a punto de vencer
+   - Notificar al propietario cuando alguien reserva su estacionamiento
+   - Recordatorio 15 minutos antes de que expire el tiempo
+
+2. HISTORIAL DE RESERVAS
+   - Pantalla con todas las reservas anteriores del usuario
+   - Estado de cada reserva (completada, cancelada, en curso)
+   - Opción de volver a reservar el mismo estacionamiento
+
+3. SISTEMA DE CALIFICACIONES Y RESEÑAS
+   - Que los usuarios puedan calificar estacionamientos (1-5 estrellas)
+   - Dejar comentarios después de usar un estacionamiento
+   - Los propietarios pueden responder reseñas
+
+4. MODO OSCURO
+   - Soporte completo para dark mode en toda la app
+   - Que respete la configuración del sistema del teléfono
+
+5. FILTROS AVANZADOS EN BÚSQUEDA
+   - Filtrar por precio máximo
+   - Filtrar por tipo (cubierto / descubierto)
+   - Filtrar por tamaño del vehículo (moto, auto, camioneta)
+   - Filtrar por disponibilidad en horario específico
+
+----------------------------------------------------------------
+ NUEVAS FUNCIONALIDADES (mediano plazo)
+----------------------------------------------------------------
+
+6. RESERVA POR HORAS FLEXIBLE
+   - Actualmente solo por periodos fijos; permitir elegir hora de
+     entrada y salida exacta
+   - Cálculo automático del costo total antes de confirmar
+
+
+8. MAPA EN TIEMPO REAL
+   - Mostrar en el mapa cuántos espacios libres tiene cada
+     estacionamiento en tiempo real
+   - Indicador visual: verde (disponible), amarillo (pocas plazas),
+     rojo (lleno)
+
+
+10. CHAT ENTRE USUARIO Y PROPIETARIO
+    - Mensajería interna en la app
+    - Para coordinar acceso, horarios especiales, etc.
+    - Sin necesidad de compartir números de teléfono
+
+11. WALLET / BILLETERA VIRTUAL
+    - Recargar saldo dentro de la app
+    - Pagar reservas con saldo disponible (más rápido que tarjeta)
+    - Historial de movimientos de saldo
+
+
+----------------------------------------------------------------
+ FUNCIONES PARA PROPIETARIOS (mediano plazo)
+----------------------------------------------------------------
+
+13. DASHBOARD CON MÁS ESTADÍSTICAS
+    - Horarios de mayor demanda (heatmap)
+    - Comparativa con mes anterior
+    - Exportar reporte en PDF
+
+----------------------------------------------------------------
+ IDEAS INNOVADORAS (largo plazo)
+----------------------------------------------------------------
+
+
+17. INTEGRACIÓN CON WAZE / GOOGLE MAPS
+    - Botón "Cómo llegar" que abre directamente la navegación
+      hacia el estacionamiento reservado
+
+19. SISTEMA DE REFERIDOS
+    - Código de descuento por referir a nuevos usuarios
+    - Recompensas para propietarios que traigan más propietarios
+
+----------------------------------------------------------------
+ MEJORAS TÉCNICAS (en paralelo con lo anterior)
+----------------------------------------------------------------
+
+- Agregar pruebas unitarias y de integración (JUnit / Espresso)
+- Implementar caché offline para ver estacionamientos sin internet
+- Optimizar carga de imágenes con lazy loading
+- Agregar analytics para entender cómo usan la app los usuarios
+- Soporte para múltiples idiomas (i18n)
+- Accesibilidad: soporte para TalkBack y tamaños de fuente grandes
+
+================================================================
+ Prioridad sugerida para el próximo sprint:
+   1. Notificaciones push
+   2. Historial de reservas
+   3. Calificaciones y reseñas
+   4. Filtros avanzados
+================================================================

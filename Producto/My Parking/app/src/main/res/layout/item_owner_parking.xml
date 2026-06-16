@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="140dp">
+
+            <ImageView
+                android:id="@+id/ivParkingImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@color/surface_variant"
+                tools:src="@drawable/ic_business" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:text="@string/status_active"
+                app:chipBackgroundColor="@color/primary_light"
+                app:chipMinHeight="28dp"
+                style="@style/Widget.Material3.Chip.Assist" />
+
+            <ImageButton
+                android:id="@+id/btnMore"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|start"
+                android:layout_margin="4dp"
+                android:background="@drawable/bg_circle_translucent"
+                android:src="@drawable/ic_more_vert"
+                android:contentDescription="Opciones"
+                android:padding="8dp" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvParkingName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Estacionamiento Central" />
+
+            <TextView
+                android:id="@+id/tvParkingAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Av. Providencia 1234, Santiago" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tvPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+                    android:textColor="?attr/colorPrimary"
+                    tools:text="$ 1.500 / hora" />
+
+                <TextView
+                    android:id="@+id/tvSpots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="8 / 20 espacios" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
