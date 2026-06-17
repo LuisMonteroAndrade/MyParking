@@ -1,4 +1,4 @@
-package com.miestacionamiento.ui.auth
+﻿package com.miestacionamiento.ui.auth
 
 import android.Manifest
 import android.content.Intent
@@ -11,12 +11,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import com.miestacionamiento.data.remote.RetrofitClient
 import com.miestacionamiento.databinding.ActivityLoginBinding
 import com.miestacionamiento.ui.main.MainActivity
 import com.miestacionamiento.utils.PreferencesManager
 import com.miestacionamiento.utils.gone
 import com.miestacionamiento.utils.visible
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class LoginActivity : AppCompatActivity() {
 
@@ -26,14 +29,23 @@ class LoginActivity : AppCompatActivity() {
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { /* resultado ignorado: el usuario puede cambiar esto en ajustes */ }
+    ) { /* resultado ignorado: el usuario puede cambiarlo en ajustes */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         prefsManager = PreferencesManager(this)
+
+        val savedToken = runBlocking { prefsManager.authToken.first() }
+        val isLoggedIn = runBlocking { prefsManager.isLoggedIn.first() }
+        if (isLoggedIn && savedToken.isNotBlank()) {
+            RetrofitClient.authInterceptor.setToken(savedToken)
+            navigateToMain()
+            return
+        }
+
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         requestNotificationPermission()
         setupObservers()
@@ -57,7 +69,6 @@ class LoginActivity : AppCompatActivity() {
                     binding.progressBar.visible()
                     binding.btnLogin.isEnabled = false
                     binding.btnGoogle.isEnabled = false
-                    binding.btnFacebook.isEnabled = false
                 }
                 is AuthState.SuccessWithData -> {
                     binding.progressBar.gone()
@@ -86,7 +97,6 @@ class LoginActivity : AppCompatActivity() {
                     binding.progressBar.gone()
                     binding.btnLogin.isEnabled = true
                     binding.btnGoogle.isEnabled = true
-                    binding.btnFacebook.isEnabled = true
                     Snackbar.make(binding.root, state.message, Snackbar.LENGTH_LONG).show()
                 }
             }
@@ -101,12 +111,11 @@ class LoginActivity : AppCompatActivity() {
             )
         }
         binding.btnGoogle.setOnClickListener { viewModel.loginWithGoogle() }
-        binding.btnFacebook.setOnClickListener { viewModel.loginWithFacebook() }
         binding.tvRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
         binding.tvForgotPassword.setOnClickListener {
-            Snackbar.make(binding.root, "Se enviará un email para restablecer tu contraseña", Snackbar.LENGTH_LONG).show()
+            startActivity(Intent(this, ForgotPasswordActivity::class.java))
         }
     }
 

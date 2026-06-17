@@ -48,6 +48,9 @@ interface ApiService {
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
+    @POST("auth/forgot-password")
+    suspend fun forgotPassword(@Body request: Map<String, String>): Response<Map<String, String>>
+
     // --- Estacionamientos ---
 
     @GET("parkings")

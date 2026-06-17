@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -100,14 +101,24 @@ class MainActivity : AppCompatActivity() {
         when (type) {
             "NEW_MESSAGE" -> {
                 binding.bottomNav.selectedItemId = R.id.chatListFragment
+                if (extraId != 0) {
+                    navController.navigate(
+                        R.id.action_chatList_to_chat,
+                        bundleOf("conversationId" to extraId, "chatTitle" to "Chat")
+                    )
+                }
             }
             "NEW_BOOKING", "PAYMENT_RECEIVED", "PARKING_FULL" -> {
                 binding.bottomNav.selectedItemId = R.id.ownerDashboardFragment
             }
             "NEW_REVIEW" -> {
-                binding.bottomNav.selectedItemId = R.id.chatListFragment
+                binding.bottomNav.selectedItemId = R.id.myParkingsFragment
             }
-            "BOOKING_CONFIRMED", "BOOKING_FAILED", "BOOKING_EXPIRING", "REVIEW_REMINDER" -> {
+            "BOOKING_CONFIRMED", "BOOKING_EXPIRING", "REVIEW_REMINDER" -> {
+                binding.bottomNav.selectedItemId = R.id.profileFragment
+                navController.navigate(R.id.bookingHistoryFragment)
+            }
+            "BOOKING_FAILED" -> {
                 binding.bottomNav.selectedItemId = R.id.homeFragment
             }
         }

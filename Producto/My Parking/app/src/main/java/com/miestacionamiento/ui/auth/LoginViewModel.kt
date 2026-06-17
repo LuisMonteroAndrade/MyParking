@@ -79,10 +79,6 @@ class LoginViewModel : ViewModel() {
     fun loginWithGoogle() {
         _state.value = AuthState.Error("Login con Google no disponible aún")
     }
-
-    fun loginWithFacebook() {
-        _state.value = AuthState.Error("Login con Facebook no disponible aún")
-    }
 }
 
 sealed class AuthState {

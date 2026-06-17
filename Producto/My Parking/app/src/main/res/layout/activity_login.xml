@@ -146,18 +146,6 @@
             app:iconGravity="textStart"
             app:iconPadding="8dp" />
 
-        <!-- Facebook -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFacebook"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/btn_facebook"
-            android:backgroundTint="@color/facebook_blue"
-            app:icon="@drawable/ic_facebook"
-            app:iconGravity="textStart"
-            app:iconPadding="8dp" />
-
         <!-- Registro -->
         <LinearLayout
             android:layout_width="match_parent"
