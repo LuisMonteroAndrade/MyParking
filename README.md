@@ -108,7 +108,6 @@ MiEstacionamiento/
 | Version | Descripcion |
 |---------|-------------|
 | **1.8.0** | Notificaciones push FCM (9 tipos), sesion persistente, pantalla de recuperar contrasena, eliminacion de login con Facebook, correcciones de navegacion desde notificaciones |
-| **1.0.0** | Version inicial: autenticacion, explorar estacionamientos, detalle con mapa, guardados y perfil basico |
 
 ---
 
@@ -120,8 +119,3 @@ MiEstacionamiento/
 - Implementar endpoint `POST /auth/forgot-password` en el backend para envio real de emails de recuperacion
 - Agregar funcionalidad del boton "Editar Perfil"
 - Agregar boton de aceptar terminos y condiciones en el registro
-
-### Bugs conocidos
-
-- El modo oscuro no cambia el tema correctamente en todas las pantallas
-- El mapa en la pantalla de exploracion presenta fallos de carga intermitentes
