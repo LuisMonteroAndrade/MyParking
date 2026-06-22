@@ -18,6 +18,7 @@ import com.miestacionamiento.data.model.OwnerDashboardData
 import com.miestacionamiento.data.model.OwnerParking
 import com.miestacionamiento.data.model.OwnerStats
 import com.miestacionamiento.data.model.Parking
+import com.miestacionamiento.data.model.ChangeRoleRequest
 import com.miestacionamiento.data.model.RegisterRequest
 import com.miestacionamiento.data.model.Review
 import com.miestacionamiento.data.model.ReviewResponseRequest
@@ -50,6 +51,9 @@ interface ApiService {
 
     @POST("auth/forgot-password")
     suspend fun forgotPassword(@Body request: Map<String, String>): Response<Map<String, String>>
+
+    @POST("auth/change-role")
+    suspend fun changeRole(@Body request: ChangeRoleRequest): Response<AuthResponse>
 
     // --- Estacionamientos ---
 

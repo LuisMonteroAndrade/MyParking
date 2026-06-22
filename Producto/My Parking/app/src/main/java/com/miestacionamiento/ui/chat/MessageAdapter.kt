@@ -10,6 +10,7 @@ import com.miestacionamiento.databinding.ItemMessageReceivedBinding
 import com.miestacionamiento.databinding.ItemMessageSentBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class MessageAdapter(
     private val currentUserId: Int
@@ -37,12 +38,14 @@ class MessageAdapter(
     }
 
     private fun formatTime(createdAt: String): String {
+        val utc = TimeZone.getTimeZone("UTC")
+        val santiago = TimeZone.getTimeZone("America/Santiago")
         val formats = listOf(
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()),
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()),
-            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply { timeZone = utc },
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).apply { timeZone = utc },
+            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).apply { timeZone = utc }
         )
-        val out = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val out = SimpleDateFormat("HH:mm", Locale.getDefault()).apply { timeZone = santiago }
         for (fmt in formats) {
             try { return out.format(fmt.parse(createdAt)!!) } catch (_: Exception) {}
         }

@@ -31,6 +31,7 @@ class PreferencesManager(private val context: Context) {
     private val USER_ADDRESS = stringPreferencesKey("user_address")
     private val USER_COMMUNE = stringPreferencesKey("user_commune")
     private val USER_REGION = stringPreferencesKey("user_region")
+    private val IS_DUAL_ROLE = booleanPreferencesKey("is_dual_role")
 
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map { it[DARK_MODE] ?: false }
     val language: Flow<String> = context.dataStore.data.map { it[LANGUAGE] ?: "es" }
@@ -48,6 +49,7 @@ class PreferencesManager(private val context: Context) {
     val userAddress: Flow<String> = context.dataStore.data.map { it[USER_ADDRESS] ?: "" }
     val userCommune: Flow<String> = context.dataStore.data.map { it[USER_COMMUNE] ?: "" }
     val userRegion: Flow<String> = context.dataStore.data.map { it[USER_REGION] ?: "" }
+    val isDualRole: Flow<Boolean> = context.dataStore.data.map { it[IS_DUAL_ROLE] ?: false }
 
     suspend fun setDarkMode(enabled: Boolean) {
         context.dataStore.edit { it[DARK_MODE] = enabled }
@@ -110,6 +112,18 @@ class PreferencesManager(private val context: Context) {
             it[USER_COMMUNE] = commune
             it[USER_REGION] = region
         }
+    }
+
+    suspend fun updateUserType(type: String) {
+        context.dataStore.edit { it[USER_TYPE] = type }
+    }
+
+    suspend fun setDualRole(enabled: Boolean) {
+        context.dataStore.edit { it[IS_DUAL_ROLE] = enabled }
+    }
+
+    suspend fun updateAuthToken(token: String) {
+        context.dataStore.edit { it[AUTH_TOKEN] = token }
     }
 
     suspend fun clearSession() {

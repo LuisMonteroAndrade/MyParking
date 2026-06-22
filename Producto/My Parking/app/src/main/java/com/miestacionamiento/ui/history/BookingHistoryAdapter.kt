@@ -12,6 +12,7 @@ import com.miestacionamiento.databinding.ItemBookingHistoryBinding
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class BookingHistoryAdapter(
     private val onRebook: (DriverBooking) -> Unit
@@ -80,8 +81,12 @@ class BookingHistoryAdapter(
         private fun formatDate(isoDate: String?): String {
             if (isoDate == null) return ""
             return try {
-                val inputFmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-                val outputFmt = SimpleDateFormat("d 'de' MMM yyyy, HH:mm", Locale("es", "CL"))
+                val inputFmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }
+                val outputFmt = SimpleDateFormat("d 'de' MMM yyyy, HH:mm", Locale("es", "CL")).apply {
+                    timeZone = TimeZone.getTimeZone("America/Santiago")
+                }
                 val date = inputFmt.parse(isoDate) ?: return isoDate
                 outputFmt.format(date)
             } catch (_: Exception) {

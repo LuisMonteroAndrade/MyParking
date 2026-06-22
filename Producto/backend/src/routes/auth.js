@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { executeQuery, oracledb } = require('../config/database');
+const { authenticateToken } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -127,6 +128,71 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Error en login:', error.message);
     res.status(500).json({ error: 'Error al iniciar sesion' });
+  }
+});
+
+// POST /api/auth/change-role
+router.post('/change-role', authenticateToken, async (req, res) => {
+  try {
+    const { userType, address, commune, region } = req.body;
+
+    if (!userType || !['DRIVER', 'OWNER'].includes(userType)) {
+      return res.status(400).json({ error: 'Tipo de usuario debe ser DRIVER u OWNER' });
+    }
+
+    if (userType === 'OWNER' && (!address || !commune || !region)) {
+      return res.status(400).json({ error: 'Dirección, comuna y región son requeridos para ser propietario' });
+    }
+
+    await executeQuery(
+      `UPDATE APP_USERS
+       SET USER_TYPE = :userType,
+           ADDRESS = NVL(:address, ADDRESS),
+           COMMUNE = NVL(:commune, COMMUNE),
+           REGION = NVL(:region, REGION),
+           UPDATED_AT = SYSTIMESTAMP
+       WHERE ID = :id`,
+      {
+        userType,
+        address: address || null,
+        commune: commune || null,
+        region: region || null,
+        id: req.user.id
+      },
+      { autoCommit: true }
+    );
+
+    const result = await executeQuery(
+      'SELECT ID, NAME, EMAIL, USER_TYPE, VEHICLE_BRAND, VEHICLE_PLATE, PHOTO_URL, ADDRESS, COMMUNE, REGION FROM APP_USERS WHERE ID = :id',
+      { id: req.user.id }
+    );
+
+    const u = result.rows[0];
+
+    const token = jwt.sign(
+      { id: u.ID, email: u.EMAIL, userType: u.USER_TYPE },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: u.ID,
+        name: u.NAME,
+        email: u.EMAIL,
+        userType: u.USER_TYPE,
+        vehicleBrand: u.VEHICLE_BRAND || null,
+        vehiclePlate: u.VEHICLE_PLATE || null,
+        photoUrl: u.PHOTO_URL || null,
+        address: u.ADDRESS || null,
+        commune: u.COMMUNE || null,
+        region: u.REGION || null
+      }
+    });
+  } catch (error) {
+    console.error('Error al cambiar rol:', error.message);
+    res.status(500).json({ error: 'Error al cambiar rol de usuario' });
   }
 });
 

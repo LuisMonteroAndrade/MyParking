@@ -36,6 +36,13 @@ data class UserProfile(
     val region: String?
 )
 
+data class ChangeRoleRequest(
+    val userType: String,
+    val address: String? = null,
+    val commune: String? = null,
+    val region: String? = null
+)
+
 data class SaveResponse(
     val isSaved: Boolean
 )

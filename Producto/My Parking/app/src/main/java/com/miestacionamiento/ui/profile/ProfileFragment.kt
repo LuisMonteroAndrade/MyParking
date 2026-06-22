@@ -40,6 +40,7 @@ class ProfileFragment : Fragment() {
     private var currentLicensePlate: String = ""
     private var currentVehiclePhotoUri: String = ""
     private var currentUserType: String = "DRIVER"
+    private var currentIsDualRole: Boolean = false
     private var currentAddress: String = ""
     private var currentCommune: String = ""
     private var currentRegion: String = ""
@@ -115,11 +116,11 @@ class ProfileFragment : Fragment() {
         viewModel.vehiclePhotoUri.observe(viewLifecycleOwner) { currentVehiclePhotoUri = it }
         viewModel.userType.observe(viewLifecycleOwner) { type ->
             currentUserType = type
-            if (type == "OWNER") {
-                binding.cardBookingHistory.gone()
-            } else {
-                binding.cardBookingHistory.visible()
-            }
+            updateRoleButtons()
+        }
+        viewModel.isDualRole.observe(viewLifecycleOwner) { dual ->
+            currentIsDualRole = dual
+            updateRoleButtons()
         }
         viewModel.userAddress.observe(viewLifecycleOwner) { currentAddress = it }
         viewModel.userCommune.observe(viewLifecycleOwner) { currentCommune = it }
@@ -144,6 +145,12 @@ class ProfileFragment : Fragment() {
             binding.chipEs.isChecked = lang == "es"
             binding.chipEn.isChecked = lang == "en"
         }
+        viewModel.changeRoleError.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+                viewModel.changeRoleError.value = null
+            }
+        }
 
         binding.chipEs.setOnClickListener { viewModel.setLanguage("es") }
         binding.chipEn.setOnClickListener { viewModel.setLanguage("en") }
@@ -156,6 +163,8 @@ class ProfileFragment : Fragment() {
             )
         }
         binding.btnEditProfile.setOnClickListener { showEditProfileDialog() }
+        binding.btnBecomeOwner.setOnClickListener { showBecomeOwnerDialog() }
+        binding.btnSwitchToDriver.setOnClickListener { showSwitchToDriverDialog() }
         binding.btnLogout.setOnClickListener { showLogoutDialog() }
     }
 
@@ -381,6 +390,76 @@ class ProfileFragment : Fragment() {
         }
 
         etAddress.setText(currentAddress)
+    }
+
+    private fun updateRoleButtons() {
+        val isOwner = currentUserType == "OWNER"
+        if (isOwner) binding.cardBookingHistory.gone() else binding.cardBookingHistory.visible()
+        // "¿Quieres ser propietario?" solo aparece si es conductor y NO tiene doble rol
+        if (!isOwner && !currentIsDualRole) binding.btnBecomeOwner.visible() else binding.btnBecomeOwner.gone()
+        // "Volver a conductor" solo aparece si es propietario Y tiene doble rol
+        if (isOwner && currentIsDualRole) binding.btnSwitchToDriver.visible() else binding.btnSwitchToDriver.gone()
+    }
+
+    private fun showSwitchToDriverDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Volver a cuenta de conductor")
+            .setMessage("Cambiarás tu vista a la cuenta de conductor. Tus datos de propietario se conservarán y podrás volver cuando quieras.")
+            .setPositiveButton("Confirmar") { _, _ ->
+                viewModel.switchToDriver {
+                    Snackbar.make(binding.root, "Cambiando a cuenta de conductor...", Snackbar.LENGTH_LONG).show()
+                    binding.root.postDelayed({ requireActivity().recreate() }, 1000)
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun showBecomeOwnerDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_become_owner, null)
+        setupOwnerEditSection(dialogView)
+
+        val tilAddress = dialogView.findViewById<TextInputLayout>(R.id.tilOwnerAddressBecome)
+        val etAddress = dialogView.findViewById<TextInputEditText>(R.id.etOwnerAddress)
+        val autoRegion = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteEditRegion)
+        val autoCommune = dialogView.findViewById<AutoCompleteTextView>(R.id.autoCompleteEditCommune)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Convertirte en propietario")
+            .setView(dialogView)
+            .setPositiveButton("Confirmar", null)
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val address = etAddress.text?.toString()?.trim() ?: ""
+                val region = autoRegion.text?.toString()?.trim() ?: ""
+                val commune = autoCommune.text?.toString()?.trim() ?: ""
+
+                tilAddress.error = null
+                if (address.isEmpty()) {
+                    tilAddress.error = "Ingresa una dirección"
+                    return@setOnClickListener
+                }
+                if (region.isEmpty()) {
+                    Snackbar.make(binding.root, "Selecciona una región", Snackbar.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (commune.isEmpty()) {
+                    Snackbar.make(binding.root, "Selecciona una comuna", Snackbar.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                dialog.dismiss()
+                viewModel.upgradeToOwner(address, commune, region) {
+                    Snackbar.make(binding.root, "¡Ahora eres propietario! Reiniciando...", Snackbar.LENGTH_LONG).show()
+                    binding.root.postDelayed({ requireActivity().recreate() }, 1500)
+                }
+            }
+        }
+
+        dialog.show()
     }
 
     private fun showLogoutDialog() {

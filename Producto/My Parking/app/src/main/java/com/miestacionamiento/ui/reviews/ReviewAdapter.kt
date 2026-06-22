@@ -12,6 +12,7 @@ import com.miestacionamiento.data.model.Review
 import com.miestacionamiento.databinding.ItemReviewBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.TimeZone
 
 class ReviewAdapter(
     private val isOwner: Boolean = false,
@@ -25,8 +26,12 @@ class ReviewAdapter(
             binding.tvReviewUserName.text = review.userName
             binding.ratingBarReview.rating = review.rating.toFloat()
 
-            val dateFormatIn = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            val dateFormatOut = SimpleDateFormat("dd MMM yyyy", Locale("es"))
+            val dateFormatIn = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }
+            val dateFormatOut = SimpleDateFormat("dd MMM yyyy", Locale("es", "CL")).apply {
+                timeZone = TimeZone.getTimeZone("America/Santiago")
+            }
             val date = try { dateFormatIn.parse(review.createdAt) } catch (e: Exception) { null }
             binding.tvReviewDate.text = if (date != null) dateFormatOut.format(date) else ""
 
