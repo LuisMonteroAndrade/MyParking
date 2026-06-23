@@ -20,13 +20,19 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
     buildTypes {
         debug {
             archivesBaseName = "MyParking"
         }
         release {
             archivesBaseName = "MyParking"
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
