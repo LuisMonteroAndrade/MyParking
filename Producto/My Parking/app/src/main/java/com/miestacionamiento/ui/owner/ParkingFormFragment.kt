@@ -1,6 +1,7 @@
 package com.miestacionamiento.ui.owner
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.net.Uri
@@ -12,6 +13,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -60,8 +62,18 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
     // Lanzador de galería
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
+            // Persistir permiso de lectura para evitar SecurityException al leer el URI después
+            try {
+                requireContext().contentResolver.takePersistableUriPermission(
+                    it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: SecurityException) {}
             selectedImageUri = it
-            binding.ivParkingPreview.setImageURI(it)
+            Glide.with(this)
+                .load(it)
+                .centerCrop()
+                .placeholder(com.miestacionamiento.R.drawable.bg_placeholder)
+                .into(binding.ivParkingPreview)
             binding.ivParkingPreview.visible()
             binding.layoutImagePlaceholder.gone()
             binding.tvImageError.gone()
@@ -72,7 +84,11 @@ class ParkingFormFragment : Fragment(), OnMapReadyCallback {
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success && cameraImageUri != null) {
             selectedImageUri = cameraImageUri
-            binding.ivParkingPreview.setImageURI(cameraImageUri)
+            Glide.with(this)
+                .load(cameraImageUri)
+                .centerCrop()
+                .placeholder(com.miestacionamiento.R.drawable.bg_placeholder)
+                .into(binding.ivParkingPreview)
             binding.ivParkingPreview.visible()
             binding.layoutImagePlaceholder.gone()
             binding.tvImageError.gone()

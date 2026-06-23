@@ -8,10 +8,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.miestacionamiento.R
 import com.miestacionamiento.data.model.OwnerParking
 import com.miestacionamiento.databinding.ItemOwnerParkingBinding
+import com.miestacionamiento.utils.loadUrl
 
 class OwnerParkingAdapter(
     private val onEdit: (OwnerParking) -> Unit,
@@ -54,11 +54,7 @@ class OwnerParkingAdapter(
             }
 
             if (parking.imageUrl.isNotEmpty()) {
-                Glide.with(binding.ivParkingImage)
-                    .load(parking.imageUrl)
-                    .centerCrop()
-                    .placeholder(R.drawable.ic_business)
-                    .into(binding.ivParkingImage)
+                binding.ivParkingImage.loadUrl(parking.imageUrl)
             } else {
                 binding.ivParkingImage.setImageResource(R.drawable.ic_business)
                 binding.ivParkingImage.setBackgroundColor(

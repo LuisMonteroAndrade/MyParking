@@ -33,6 +33,10 @@ class ParkingRepository(
                         isRecentlyViewed = recentIds.contains(p.id) || p.isRecentlyViewed
                     )
                 })
+                // Sincronizar caché: borrar localmente los que ya no existen en el backend
+                if (apiParkings.isNotEmpty()) {
+                    dao.deleteRemovedParkings(apiParkings.map { it.id })
+                }
             }
         } catch (e: Exception) {
             // Sin red: se usan los datos en caché de Room
@@ -77,11 +81,6 @@ class ParkingRepository(
                 "Av. Libertador B. O'Higgins 3322, Santiago Centro",
                 "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=600",
                 -33.4475, -70.6527, 1200.0, 45, 120, 4.5f, 238),
-            Parking(2, "Cochera Providencia",
-                "Amplio estacionamiento cubierto con servicio de valet y vigilancia permanente.",
-                "Av. Providencia 1234, Providencia",
-                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
-                -33.4312, -70.6126, 1500.0, 12, 80, 4.2f, 156),
             Parking(3, "Parking Costanera Center",
                 "Moderno estacionamiento en el mall más grande de Chile.",
                 "Av. Andrés Bello 2425, Providencia",

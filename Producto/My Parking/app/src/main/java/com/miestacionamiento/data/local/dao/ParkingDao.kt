@@ -40,6 +40,9 @@ interface ParkingDao {
     @Query("UPDATE parkings SET isRecentlyViewed = :isViewed WHERE id = :id")
     suspend fun updateRecentlyViewed(id: Int, isViewed: Boolean)
 
+    @Query("DELETE FROM parkings WHERE id NOT IN (:activeIds)")
+    suspend fun deleteRemovedParkings(activeIds: List<Int>)
+
     @Query("SELECT COUNT(*) FROM parkings")
     suspend fun count(): Int
 }
