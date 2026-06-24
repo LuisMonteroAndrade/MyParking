@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
+const { init: initFirebase } = require('./services/notificationService');
 const authRoutes = require('./routes/auth');
 const parkingRoutes = require('./routes/parkings');
 const userRoutes = require('./routes/users');
@@ -12,6 +13,8 @@ const chatRoutes = require('./routes/chat');
 const paymentRoutes = require('./routes/payments');
 
 const app = express();
+
+initFirebase();
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));

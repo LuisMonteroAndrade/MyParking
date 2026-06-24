@@ -3,7 +3,7 @@
     <string name="app_name">MyParking</string>
 
     <!-- Auth -->
-    <string name="login_subtitle">Busca, Reserva y Estaciona</string>
+    <string name="login_subtitle">Encuentra, Reserva y Estaciona</string>
     <string name="hint_email">Correo electrónico</string>
     <string name="hint_password">Contraseña</string>
     <string name="hint_confirm_password">Confirmar contraseña</string>

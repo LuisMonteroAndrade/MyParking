@@ -1,6 +1,7 @@
 const express = require('express');
 const { executeQuery, oracledb } = require('../config/database');
 const { authenticateToken: authMiddleware } = require('../middleware/authMiddleware');
+const { notifyNewReview } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -49,19 +50,21 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     const parkingCheck = await executeQuery(
-      'SELECT ID FROM PARKINGS WHERE ID = :id',
+      'SELECT ID, OWNER_ID, NAME FROM PARKINGS WHERE ID = :id',
       { id: parkingId }
     );
     if (parkingCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Estacionamiento no encontrado' });
     }
+    const parking = parkingCheck.rows[0];
 
     const existing = await executeQuery(
       'SELECT ID FROM REVIEWS WHERE PARKING_ID = :parkingId AND USER_ID = :userId',
       { parkingId, userId }
     );
+    const isNewReview = existing.rows.length === 0;
 
-    if (existing.rows.length > 0) {
+    if (!isNewReview) {
       await executeQuery(
         `UPDATE REVIEWS SET RATING = :rating, REVIEW_COMMENT = :reviewComment, CREATED_AT = CURRENT_TIMESTAMP
          WHERE PARKING_ID = :parkingId AND USER_ID = :userId`,
@@ -102,6 +105,11 @@ router.post('/', authMiddleware, async (req, res) => {
       createdAt: r.CREATED_AT,
       userName: r.USER_NAME
     });
+
+    // Notificar al propietario solo cuando es una reseña nueva (no actualización)
+    if (isNewReview) {
+      notifyNewReview(parking.OWNER_ID, r.ID, parking.NAME, rating).catch(() => {});
+    }
   } catch (error) {
     console.error('Error creando reseña:', error.message);
     res.status(500).json({ error: 'Error al crear reseña' });

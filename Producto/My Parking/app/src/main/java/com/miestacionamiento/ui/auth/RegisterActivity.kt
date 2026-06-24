@@ -62,7 +62,7 @@ class RegisterActivity : AppCompatActivity() {
         val marcasVehiculos = arrayOf(
             "Abarth", "Alfa Romeo", "Aston Martin", "Audi", "Austin", "BMW", "BYD", "Baic", "Bentley",
             "Bestune", "Brilliance", "Cadillac", "Changan", "Changhe", "Chery", "Chevrolet", "Chrysler",
-            "CitroÃ«n", "Cupra", "DFSK", "DS Automobiles", "Dacia", "Daewoo", "Daihatsu", "Dodge",
+            "Citroën", "Cupra", "DFSK", "DS Automobiles", "Dacia", "Daewoo", "Daihatsu", "Dodge",
             "Dongfeng", "Exeed", "FAW", "Ferrari", "Fiat", "Ford", "Foton", "GAC Motor", "GMC",
             "Geely", "Great Wall", "Haval", "Honda", "Hummer", "Hyundai", "Infiniti", "Isuzu", "Iveco",
             "JAC", "JMC", "Jaguar", "Jeep", "Jetour", "Kaiyi", "Karma", "Kia", "KyC", "Lamborghini",
@@ -85,94 +85,94 @@ class RegisterActivity : AppCompatActivity() {
             "Arica y Parinacota" to listOf(
                 "Arica", "Camarones", "Putre", "General Lagos"
             ),
-            "TarapacÃ¡" to listOf(
-                "Iquique", "Alto Hospicio", "Pozo Almonte", "CamiÃ±a", "Colchane", "Huara", "Pica"
+            "Tarapacá" to listOf(
+                "Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"
             ),
             "Antofagasta" to listOf(
-                "Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "OllagÃ¼e",
-                "San Pedro de Atacama", "Tocopilla", "MarÃ­a Elena"
+                "Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe",
+                "San Pedro de Atacama", "Tocopilla", "María Elena"
             ),
             "Atacama" to listOf(
-                "CopiapÃ³", "Caldera", "Tierra Amarilla", "ChaÃ±aral", "Diego de Almagro",
+                "Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro",
                 "Vallenar", "Alto del Carmen", "Freirina", "Huasco"
             ),
             "Coquimbo" to listOf(
-                "La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "VicuÃ±a",
-                "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "CombarbalÃ¡",
-                "Monte Patria", "Punitaqui", "RÃ­o Hurtado"
+                "La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña",
+                "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá",
+                "Monte Patria", "Punitaqui", "Río Hurtado"
             ),
-            "ValparaÃ­so" to listOf(
-                "ValparaÃ­so", "Casablanca", "ConcÃ³n", "Juan FernÃ¡ndez", "PuchuncavÃ­", "Quintero",
-                "ViÃ±a del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada",
+            "Valparaíso" to listOf(
+                "Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero",
+                "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada",
                 "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar",
                 "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio",
                 "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe",
-                "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa MarÃ­a", "QuilpuÃ©",
-                "Limache", "OlmuÃ©", "Villa Alemana"
+                "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué",
+                "Limache", "Olmué", "Villa Alemana"
             ),
             "Metropolitana de Santiago" to listOf(
-                "Santiago", "Cerrillos", "Cerro Navia", "ConchalÃ­", "El Bosque", "EstaciÃ³n Central",
+                "Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central",
                 "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana",
-                "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "MaipÃº",
-                "Ã‘uÃ±oa", "Pedro Aguirre Cerda", "PeÃ±alolÃ©n", "Providencia", "Pudahuel", "Quilicura",
-                "Quinta Normal", "Recoleta", "Renca", "San JoaquÃ­n", "San Miguel", "San RamÃ³n",
-                "Vitacura", "Puente Alto", "Pirque", "San JosÃ© de Maipo", "Colina", "Lampa", "Tiltil",
-                "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "AlhuÃ©", "CuracavÃ­",
-                "MarÃ­a Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado",
-                "PeÃ±aflor"
+                "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú",
+                "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura",
+                "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón",
+                "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil",
+                "San Bernardo", "Buin", "Calera de Tango", "Paine", "Melipilla", "Alhué", "Curacaví",
+                "María Pinto", "San Pedro", "Talagante", "El Monte", "Isla de Maipo", "Padre Hurtado",
+                "Peñaflor"
             ),
             "O'Higgins" to listOf(
-                "Rancagua", "Codegua", "Coinco", "Coltauco", "DoÃ±ihue", "Graneros", "Las Cabras",
-                "MachalÃ­", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco",
-                "Rengo", "RequÃ­noa", "San Vicente", "Pichilemu", "La Estrella", "Litueche",
-                "Marchihue", "Navidad", "Paredones", "San Fernando", "ChÃ©pica", "Chimbarongo",
+                "Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras",
+                "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco",
+                "Rengo", "Requínoa", "San Vicente", "Pichilemu", "La Estrella", "Litueche",
+                "Marchihue", "Navidad", "Paredones", "San Fernando", "Chépica", "Chimbarongo",
                 "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Pumanque", "Santa Cruz"
             ),
             "Maule" to listOf(
-                "Talca", "ConstituciÃ³n", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue",
-                "RÃ­o Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue",
-                "CuricÃ³", "HualaÃ±Ã©", "LicantÃ©n", "Molina", "Rauco", "Romeral", "Sagrada Familia",
-                "Teno", "VichuquÃ©n", "Linares", "ColbÃºn", "LongavÃ­", "Parral", "Retiro",
+                "Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue",
+                "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue",
+                "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia",
+                "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro",
                 "San Javier", "Villa Alegre", "Yerbas Buenas"
             ),
-            "Ã‘uble" to listOf(
-                "ChillÃ¡n", "Bulnes", "ChillÃ¡n Viejo", "El Carmen", "Pemuco", "Pinto", "QuillÃ³n",
+            "Ñuble" to listOf(
+                "Chillán", "Bulnes", "Chillán Viejo", "El Carmen", "Pemuco", "Pinto", "Quillón",
                 "San Ignacio", "Yungay", "Quirihue", "Cobquecura", "Coelemu", "Ninhue",
-                "Portezuelo", "RÃ¡nquil", "Treguaco", "San Carlos", "Coihueco", "Ã‘iquÃ©n",
-                "San FabiÃ¡n", "San NicolÃ¡s"
+                "Portezuelo", "Ránquil", "Treguaco", "San Carlos", "Coihueco", "Ñiquén",
+                "San Fabián", "San Nicolás"
             ),
-            "BiobÃ­o" to listOf(
-                "ConcepciÃ³n", "Coronel", "Chiguayante", "Florida", "HualpÃ©n", "Hualqui", "Lota",
-                "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "TomÃ©",
-                "Los Ãngeles", "Antuco", "Cabrero", "Laja", "MulchÃ©n", "Nacimiento", "Negrete",
-                "Quilaco", "Quilleco", "San Rosendo", "Santa BÃ¡rbara", "Tucapel", "Yumbel",
-                "Arauco", "CaÃ±ete", "Contulmo", "Curanilahue", "Lebu", "Los Ãlamos", "TirÃºa"
+            "Biobío" to listOf(
+                "Concepción", "Coronel", "Chiguayante", "Florida", "Hualpén", "Hualqui", "Lota",
+                "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé",
+                "Los Ángeles", "Antuco", "Cabrero", "Laja", "Mulchén", "Nacimiento", "Negrete",
+                "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel",
+                "Arauco", "Cañete", "Contulmo", "Curanilahue", "Lebu", "Los Álamos", "Tirúa"
             ),
-            "La AraucanÃ­a" to listOf(
+            "La Araucanía" to listOf(
                 "Temuco", "Carahue", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea",
                 "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco",
-                "PitrufquÃ©n", "PucÃ³n", "Saavedra", "Teodoro Schmidt", "ToltÃ©n", "VilcÃºn",
-                "Villarrica", "Cholchol", "Angol", "Collipulli", "CuracautÃ­n", "Ercilla",
-                "Lonquimay", "Los Sauces", "Lumaco", "PurÃ©n", "Renaico", "TraiguÃ©n", "Victoria"
+                "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún",
+                "Villarrica", "Cholchol", "Angol", "Collipulli", "Curacautín", "Ercilla",
+                "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"
             ),
-            "Los RÃ­os" to listOf(
-                "Valdivia", "Corral", "Futrono", "La UniÃ³n", "Lago Ranco", "Lanco", "Los Lagos",
-                "MÃ¡fil", "Mariquina", "Paillaco", "Panguipulli", "RÃ­o Bueno"
+            "Los Ríos" to listOf(
+                "Valdivia", "Corral", "Futrono", "La Unión", "Lago Ranco", "Lanco", "Los Lagos",
+                "Máfil", "Mariquina", "Paillaco", "Panguipulli", "Río Bueno"
             ),
             "Los Lagos" to listOf(
-                "Puerto Montt", "Calbuco", "CochamÃ³", "Fresia", "Frutillar", "Los Muermos",
-                "Llanquihue", "MaullÃ­n", "Puerto Varas", "Castro", "Ancud", "Chonchi",
-                "Curaco de VÃ©lez", "Dalcahue", "PuqueldÃ³n", "QueilÃ©n", "QuellÃ³n", "Quemchi",
-                "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "RÃ­o Negro",
-                "San Juan de la Costa", "San Pablo", "ChaitÃ©n", "FutaleufÃº", "HualaihuÃ©", "Palena"
+                "Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos",
+                "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi",
+                "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi",
+                "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro",
+                "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"
             ),
-            "AysÃ©n" to listOf(
-                "Coyhaique", "Lago Verde", "AysÃ©n", "Cisnes", "Guaitecas", "Cochrane",
-                "O'Higgins", "Tortel", "Chile Chico", "RÃ­o IbÃ¡Ã±ez"
+            "Aysén" to listOf(
+                "Coyhaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Cochrane",
+                "O'Higgins", "Tortel", "Chile Chico", "Río Ibáñez"
             ),
-            "Magallanes y la AntÃ¡rtica Chilena" to listOf(
-                "Punta Arenas", "Laguna Blanca", "RÃ­o Verde", "San Gregorio", "Cabo de Hornos",
-                "AntÃ¡rtica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"
+            "Magallanes y la Antártica Chilena" to listOf(
+                "Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos",
+                "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"
             )
         )
 
@@ -258,11 +258,11 @@ class RegisterActivity : AppCompatActivity() {
             val comuna = binding.autoCompleteCommune.text.toString().trim()
 
             if (selectedUserType == "DRIVER" && marcaSeleccionada.isEmpty()) {
-                Snackbar.make(binding.root, "Por favor selecciona una marca de vehÃ­culo", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Por favor selecciona una marca de vehículo", Snackbar.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (selectedUserType == "OWNER" && region.isEmpty()) {
-                Snackbar.make(binding.root, "Por favor selecciona una regiÃ³n", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Por favor selecciona una región", Snackbar.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             if (selectedUserType == "OWNER" && comuna.isEmpty()) {

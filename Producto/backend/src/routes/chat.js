@@ -1,6 +1,7 @@
 const express = require('express');
 const { executeQuery, oracledb } = require('../config/database');
 const { authenticateToken: authMiddleware } = require('../middleware/authMiddleware');
+const { notifyNewMessage } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -183,14 +184,20 @@ router.post('/conversations/:id/messages', authMiddleware, async (req, res) => {
       { autoCommit: true }
     );
 
+    const newMessageId = result.outBinds.id[0];
+    const trimmedContent = content.trim();
+
     res.status(201).json({
-      id: result.outBinds.id[0],
+      id: newMessageId,
       conversationId,
       senderId,
-      content: content.trim(),
+      content: trimmedContent,
       isRead: false,
       createdAt: new Date().toISOString()
     });
+
+    // Notificar al destinatario (no bloquea la respuesta)
+    notifyNewMessage(conversationId, senderId, trimmedContent).catch(() => {});
   } catch (error) {
     console.error('Error enviando mensaje:', error.message);
     res.status(500).json({ error: 'Error al enviar mensaje' });

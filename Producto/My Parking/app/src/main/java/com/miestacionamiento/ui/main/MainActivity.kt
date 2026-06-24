@@ -1,29 +1,48 @@
 package com.miestacionamiento.ui.main
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.messaging.FirebaseMessaging
 import com.miestacionamiento.R
+import com.miestacionamiento.data.remote.RetrofitClient
 import com.miestacionamiento.databinding.ActivityMainBinding
+import com.miestacionamiento.utils.NotificationHelper
 import com.miestacionamiento.utils.PreferencesManager
 import com.miestacionamiento.utils.gone
 import com.miestacionamiento.utils.visible
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* Resultado silencioso — el usuario decide */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        NotificationHelper.createChannels(this)
+        requestNotificationPermissionIfNeeded()
+        registerFcmToken()
 
         val userType = runBlocking {
             PreferencesManager(this@MainActivity).userType.first()
@@ -93,6 +112,29 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment ?: return
         handleNotificationIntent(intent, navHostFragment.navController)
+    }
+
+    private fun registerFcmToken() {
+        lifecycleScope.launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                RetrofitClient.instance.registerFcmToken(mapOf("token" to token))
+                Log.d("MainActivity", "FCM token registrado correctamente")
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error registrando FCM token: ${e.message}")
+            }
+        }
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (!granted) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     private fun handleNotificationIntent(intent: Intent?, navController: NavController) {

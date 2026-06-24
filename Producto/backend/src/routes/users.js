@@ -110,6 +110,23 @@ router.put('/profile', authenticateToken, async (req, res) => {
   }
 });
 
+// POST /api/users/fcm-token — registrar token de notificaciones push
+router.post('/fcm-token', authenticateToken, async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: 'token es requerido' });
+    await executeQuery(
+      'UPDATE APP_USERS SET FCM_TOKEN = :token WHERE ID = :id',
+      { token, id: req.user.id },
+      { autoCommit: true }
+    );
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error al guardar FCM token:', error.message);
+    res.status(500).json({ error: 'Error al guardar token' });
+  }
+});
+
 // POST /api/users/photo
 router.post('/photo', authenticateToken, upload.single('photo'), async (req, res) => {
   try {

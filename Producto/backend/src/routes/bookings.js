@@ -1,6 +1,7 @@
 const express = require('express');
 const { executeQuery, oracledb } = require('../config/database');
 const { authenticateToken } = require('../middleware/authMiddleware');
+const { notifyBookingConfirmed, notifyNewBooking } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ router.post('/', async (req, res) => {
 
     // Verificar que el estacionamiento existe y está activo
     const parkingResult = await executeQuery(
-      `SELECT ID, PRICE_PER_HOUR, AVAILABLE_SPOTS, IS_ACTIVE, NAME
+      `SELECT ID, PRICE_PER_HOUR, AVAILABLE_SPOTS, IS_ACTIVE, NAME, OWNER_ID
        FROM PARKINGS WHERE ID = :parkingId`,
       { parkingId }
     );
@@ -86,6 +87,11 @@ router.post('/', async (req, res) => {
       hours: Number(row.HOURS),
       createdAt: row.CREATED_AT ? new Date(row.CREATED_AT).toISOString() : null
     });
+
+    // Notificar al conductor y al propietario (no bloquea la respuesta)
+    const hrs = parseInt(hours);
+    notifyBookingConfirmed(driverId, newBookingId, parking.NAME, hrs).catch(() => {});
+    notifyNewBooking(parking.OWNER_ID, driverId, newBookingId, parking.NAME, hrs).catch(() => {});
   } catch (error) {
     console.error('Error al crear reserva:', error.message);
     res.status(500).json({ error: 'Error al procesar la reserva' });

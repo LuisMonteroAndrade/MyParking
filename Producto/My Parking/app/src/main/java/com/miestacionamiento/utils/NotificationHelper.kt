@@ -5,7 +5,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.miestacionamiento.R
@@ -15,28 +20,59 @@ import java.util.Locale
 
 object NotificationHelper {
 
-    const val CHANNEL_BOOKINGS = "channel_bookings"
-    const val CHANNEL_PAYMENTS = "channel_payments"
-    const val CHANNEL_CHAT = "channel_chat"
-    const val CHANNEL_REVIEWS = "channel_reviews"
+    // IDs v2: fuerzan recreación de canales con la importancia correcta
+    const val CHANNEL_BOOKINGS = "channel_bookings_v2"
+    const val CHANNEL_PAYMENTS = "channel_payments_v2"
+    const val CHANNEL_CHAT    = "channel_chat_v2"
+    const val CHANNEL_REVIEWS = "channel_reviews_v2"
+
+    private val VIBRATION_PATTERN = longArrayOf(0, 250, 150, 250)
 
     fun createChannels(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            listOf(
+            val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val audioAttr = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+
+            val channels = listOf(
                 NotificationChannel(CHANNEL_BOOKINGS, "Reservas", NotificationManager.IMPORTANCE_HIGH).apply {
                     description = "Confirmaciones y estados de reservas"
+                    enableVibration(true)
+                    vibrationPattern = VIBRATION_PATTERN
+                    setSound(soundUri, audioAttr)
+                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
                 },
                 NotificationChannel(CHANNEL_PAYMENTS, "Pagos", NotificationManager.IMPORTANCE_HIGH).apply {
-                    description = "Confirmaciones de pago"
+                    description = "Confirmaciones de pago recibido"
+                    enableVibration(true)
+                    vibrationPattern = VIBRATION_PATTERN
+                    setSound(soundUri, audioAttr)
+                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
                 },
-                NotificationChannel(CHANNEL_CHAT, "Mensajes", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                NotificationChannel(CHANNEL_CHAT, "Mensajes", NotificationManager.IMPORTANCE_HIGH).apply {
                     description = "Mensajes entre conductores y propietarios"
+                    enableVibration(true)
+                    vibrationPattern = VIBRATION_PATTERN
+                    setSound(soundUri, audioAttr)
+                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
                 },
-                NotificationChannel(CHANNEL_REVIEWS, "Reseñas", NotificationManager.IMPORTANCE_LOW).apply {
-                    description = "Nuevas reseñas y recordatorios"
+                NotificationChannel(CHANNEL_REVIEWS, "Reseñas", NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = "Nuevas reseñas en tus estacionamientos"
+                    enableVibration(true)
+                    vibrationPattern = VIBRATION_PATTERN
+                    setSound(soundUri, audioAttr)
+                    lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
                 }
-            ).forEach { manager.createNotificationChannel(it) }
+            )
+
+            // Eliminar canales viejos para evitar confusión
+            listOf("channel_bookings", "channel_payments", "channel_chat", "channel_reviews")
+                .forEach { manager.deleteNotificationChannel(it) }
+
+            channels.forEach { manager.createNotificationChannel(it) }
         }
     }
 
@@ -154,24 +190,29 @@ object NotificationHelper {
         body: String,
         pendingIntent: PendingIntent
     ) {
-        val priority = when (channelId) {
-            CHANNEL_BOOKINGS, CHANNEL_PAYMENTS -> NotificationCompat.PRIORITY_HIGH
-            CHANNEL_CHAT -> NotificationCompat.PRIORITY_DEFAULT
-            else -> NotificationCompat.PRIORITY_LOW
-        }
+        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notifications)
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setPriority(priority)
+            // Banner emergente y pantalla de bloqueo
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            // Sonido y vibración
+            .setSound(soundUri)
+            .setVibrate(VIBRATION_PATTERN)
+            .setDefaults(NotificationCompat.DEFAULT_LIGHTS)
+            // Comportamiento
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()
+
         try {
             NotificationManagerCompat.from(context).notify(id, notification)
         } catch (_: SecurityException) {
-            // Permiso no concedido aún
+            // Permiso POST_NOTIFICATIONS no concedido
         }
     }
 }
