@@ -1,4 +1,4 @@
-# Mi Estacionamiento - Aplicacion Android
+# My Parking - Aplicacion Android
 
 > Plataforma movil para la reserva y gestion de estacionamientos en Chile.
 > Conecta a conductores que buscan estacionamiento con propietarios que ofrecen espacios disponibles.
@@ -10,7 +10,7 @@
 ## Estructura del repositorio
 
 ```
-MiEstacionamiento/
+MyParking/
 |
 +-- Documentacion/
 |   +-- Diagrama/              <- Diagramas UML y de arquitectura
