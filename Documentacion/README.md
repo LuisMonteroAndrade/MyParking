@@ -1,6 +1,6 @@
-Proyecto "Mi Estacionamiento"
+Proyecto "MyParking"
 
-  Mi_Estacionamiento/
+  MyParking/
 │
 ├── Documentacion/
 │   ├── Diagrama/
